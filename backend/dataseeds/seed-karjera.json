@@ -1,0 +1,48 @@
+[
+  {
+    "title": "Darbų vadovas",
+    "description": "Atsakingas už statybos darbų organizavimą, kokybės užtikrinimą, saugą ir komunikaciją objekte.",
+    "responsibilities": [
+      {
+        "title": "Darbų organizavimas ir kontrolė",
+        "items": [
+          "Vadovavimas statybos darbų vykdymui objekte pagal projektą, grafiką ir techninius reikalavimus",
+          "Darbo jėgos ir mechanizmų paskirstymas objekte",
+          "Statybos darbų eigos koordinavimas, užtikrinant nuoseklumą tarp įvairių darbų etapų"
+        ]
+      },
+      {
+        "title": "Kokybės ir terminų užtikrinimas",
+        "items": [
+          "Statybos darbų vykdymas laikantis kokybės standartų, projektinių sprendinių ir techninių reglamentų",
+          "Terminų kontrolė ir priemonių ėmimasis, jei kyla vėlavimo rizika",
+          "Atliekamų darbų dokumentavimas (aktai, žurnalai ir kt.)"
+        ]
+      },
+      {
+        "title": "Darbo sauga ir aplinkosauga",
+        "items": [
+          "Darbų saugos reikalavimų užtikrinimas objekte",
+          "Rizikų vertinimas ir prevencinių veiksmų taikymas",
+          "Atsakomybė už tvarką ir švarą statybvietėje"
+        ]
+      },
+      {
+        "title": "Bendradarbiavimas ir komunikacija",
+        "items": [
+          "Bendravimas su projektuotojais, užsakovais, subrangovais ir technine priežiūra",
+          "Reikalingos informacijos ir techninių sprendimų derinimas",
+          "Komandos koordinavimas, darbuotojų instruktavimas ir motyvavimas"
+        ]
+      },
+      {
+        "title": "Medžiagų ir resursų valdymas",
+        "items": [
+          "Statybinių medžiagų planavimas",
+          "Tiekimo proceso derinimas ir medžiagų kokybės tikrinimas",
+          "Sandėliavimo ir medžiagų apskaitos priežiūra"
+        ]
+      }
+    ]
+  }
+]

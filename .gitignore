@@ -1,0 +1,15 @@
+# Next.js build output
+.next/
+# Visual Studio workspace/cache
+.vs/
+# Other common folders
+node_modules/
+dist/
+build/
+
+# Node modules
+node_modules/
+# Build output, logs, etc.
+dist/
+build/
+*.log

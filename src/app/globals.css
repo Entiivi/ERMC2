@@ -1,0 +1,57 @@
+﻿@font-face {
+    font-family: 'Moonhouse';
+    src: url('/fonts/Moonhouse.ttf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Library3am';
+    src: url('/fonts/Library3am.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Library3amSoft';
+    src: url('/fonts/Library3amSoft.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Martius';
+    src: url('/fonts/Martius.ttf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'MartiusItalic';
+    src: url('/fonts/MartiusItalic') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
+}
+
+.scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.no-child-scroll, .no-child-scroll * {
+  overflow: visible !important;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+

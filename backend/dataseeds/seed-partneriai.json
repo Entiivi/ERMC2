@@ -1,0 +1,10 @@
+[
+  { "name": "AB “Achema”, Jonava", "imageSrc": "/photos/partneriu/achema.png", "imageAlt": "Achema logo" },
+  { "name": "AB Orlen Lithuania", "imageSrc": "/photos/partneriu/orlen.jpg", "imageAlt": "Orlen Lithuania logo" },
+  { "name": "Enefit", "imageSrc": "/photos/partneriu/enefit.jpg", "imageAlt": "Enefit logo" },
+  { "name": "Klaipėdos nafta", "imageSrc": "/photos/partneriu/klaipedos-nafta.jpg", "imageAlt": "Klaipėdos nafta logo" },
+  { "name": "Vilniaus šilumos tinklai", "imageSrc": "/photos/partneriu/vilniussil.jpg", "imageAlt": "Vilniaus šilumos tinklai logo" },
+  { "name": "Axis Technologies", "imageSrc": "/photos/partneriu/axis.png", "imageAlt": "Axis Technologies logo" },
+  { "name": "Lietuvos energijos gamyba", "imageSrc": "/photos/partneriu/lietuvos-energija.png", "imageAlt": "Lietuvos energijos gamyba logo" },
+  { "name": "Lietuvos Geležinkeliai", "imageSrc": "/photos/partneriu/ltgel.jpg", "imageAlt": "Lietuvos Geležinkeliai logo" }
+]

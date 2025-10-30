@@ -1,0 +1,26 @@
+[
+  {
+    "title": "Įvairios įrangos montavimas ir priežiūra",
+    "subtitle": "Montuojame ir prižiūrime statybos objektuose naudojamą įrangą",
+    "iconUrl": "/icons/mirp.svg",
+    "details": "Darbo pobūdis apima statybos objektuose naudojamos įvairios įrangos montavimą, paleidimą, techninę priežiūrą ir remontą. Tai gali būti elektros skydai, siurbliai, ventiliacijos ir šildymo sistemos, automatinio valdymo įranga, statybiniai keltuvai ar kita mechaninė įranga.\n\n- Garo turbinų montavimo darbai\n- Šilumokaičių ir katilų montavimas ir priežiūra\n- Pagalbinės įrangos ir vamzdynų montavimas\n- Techninė priežiūra ir remonto darbai"
+  },
+  {
+    "title": "Metalinių konstrukcijų gamyba ir montavimas",
+    "subtitle": "Žemės ūkio, pramoninių ar pastatų metalinių konstrukcijų pilnas ciklas",
+    "iconUrl": "/icons/kbmon.svg",
+    "details": "Įvairių metalinių konstrukcijų gamyba dirbtuvėse bei jų montavimas statybos objektuose.\n\nPagrindinės atsakomybės:\n- Metalinių detalių gamyba pagal brėžinius ar techninę dokumentaciją\n- Konstrukcijų surinkimas ir suvirinimas gamybos ceche arba objekte\n- Paruoštų elementų montavimas statybos aikštelėje\n- Darbas su metalo apdirbimo įranga\n- Kokybės, saugos ir technologinių procesų laikymasis"
+  },
+  {
+    "title": "Technologinių sprendimų projektavimas",
+    "subtitle": "Projektuojame efektyvias, ekonomiškai pagrįstas technologines sistemas",
+    "iconUrl": "/icons/tpsp.svg",
+    "details": "Technologinių procesų, inžinerinių sistemų ar gamybos linijų projektavimas pagal klientų poreikius.\n\nPagrindinės atsakomybės:\n- Procesų ir sistemų projektavimas (gamybos, vėdinimo, šildymo...)\n- Sprendimų skaičiavimai ir optimizavimas\n- Techninės dokumentacijos ruošimas\n- Bendradarbiavimas su architektais, inžinieriais\n- Sprendimų derinimas su užsakovu"
+  },
+  {
+    "title": "Inžinerinių / Statybos projektų valdymas",
+    "subtitle": "Pilnas projektų ciklas: planavimas, koordinavimas, įgyvendinimas",
+    "iconUrl": "/icons/vald.svg",
+    "details": "Visapusiškas inžinerinių arba statybos projektų planavimas, koordinavimas, priežiūra.\n\nPagrindinės atsakomybės:\n- Darbų grafiko sudarymas ir sąnaudų skaičiavimas\n- Terminų, biudžeto ir kokybės kontrolė\n- Derybos su užsakovais ir subrangovais\n- Dokumentacijos priežiūra ir pokyčių valdymas\n- Objekto kokybės ir saugos kontrolė"
+  }
+]

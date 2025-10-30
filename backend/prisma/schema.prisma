@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/* ===== Core: Projektai + Žymos (Tags) ===== */
+
+model Projektas {
+  id        String        @id @default(cuid())
+  title     String        @unique
+  date      DateTime
+  cover     String
+  logoUrl   String?
+  tech      Json
+  excerpt   String?
+  link      String?
+  photos    Photo[] 
+  tags      ProjektasTag[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model Tag {
+  id         String         @id @default(cuid())
+  name       String         @unique
+  projektai  ProjektasTag[]
+  paraiskos  CvTag[]
+}
+
+model ProjektasTag {
+  projektasId String
+  tagId       String
+
+  projektas   Projektas @relation(fields: [projektasId], references: [id], onDelete: Cascade)
+  tag         Tag       @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([projektasId, tagId])
+}
+
+/* ===== Nuotraukos (photos) ===== */
+
+model Photo {
+  id          String    @id @default(cuid())
+  url         String
+  caption     String?
+  projektas   Projektas @relation(fields: [projektasId], references: [id], onDelete: Cascade)
+  projektasId String
+}
+
+/* ===== Apie mus ===== */
+
+model Apie {
+  id        String   @id @default(cuid())
+  title     String   @unique 
+  content   String
+  order     Int
+  updatedAt DateTime @updatedAt
+}
+
+/* ===== Paslaugos ===== */
+
+model Paslauga {
+  id        String   @id @default(cuid())
+  title     String   @unique
+  subtitle  String
+  iconUrl   String
+  details   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/* ===== Partneriai ===== */
+
+model Partneris {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  imageSrc  String
+  imageAlt  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/* ===== Kontaktai ===== */
+
+model Kontaktas {
+  id        String   @id @default(cuid())
+  label     String   @unique
+  value     String
+  copyable  Boolean  @default(false)
+  icon      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/* ===== Karjeros paraiškos (CV / Application) ===== */
+
+model Paraiska {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  position    String
+  cvUrl       String?
+  message     String?
+  tags        CvTag[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CvTag {
+  paraiskaId String
+  tagId      String
+
+  paraiska   Paraiska @relation(fields: [paraiskaId], references: [id], onDelete: Cascade)
+  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([paraiskaId, tagId])
+}
+
+/* ===== Darbo skelbimai ===== */
+
+model Darbas {
+  id               String   @id @default(cuid())
+  title            String   @unique
+  location         String?
+  type             String?
+  description      String?
+  responsibilities Json
+  salary           String?
+  postedAt         DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}

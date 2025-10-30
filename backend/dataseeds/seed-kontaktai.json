@@ -1,0 +1,7 @@
+[
+  { "label": "Įmonės kodas", "value": "302151534", "copyable": true, "icon": "/icons/company.svg" },
+  { "label": "PVM mokėtojo kodas", "value": "LT10000482916", "copyable": true, "icon": "/icons/pvm.svg" },
+  { "label": "Direktorius", "value": "Andrius Urnikis", "copyable": false, "icon": "/icons/user.svg" },
+  { "label": "Adresas", "value": "A. Juozapavičiaus pr. 7B, LT-45251 Kaunas", "copyable": true, "icon": "/icons/location.svg" },
+  { "label": "Mobilus telefonas", "value": "+370 616 44551", "copyable": false, "icon": "/icons/phone.svg" }
+]
