@@ -49,6 +49,8 @@ model Photo {
   caption     String?
   projektas   Projektas @relation(fields: [projektasId], references: [id], onDelete: Cascade)
   projektasId String
+
+  @@index([projektasId])
 }
 
 /* ===== Apie mus ===== */

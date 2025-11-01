@@ -5,13 +5,12 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import type { FullProjectDTO } from "@/app/lib/api";
 
+type PhotoRef = { id: string; caption: string | null; href: string; original?: string };
+
 type Props = {
   selected: FullProjectDTO | null;
-  gallery: string[];          // e.g. ["/photos/placeholder.jpg", ...]
   imgIdx: number;
   setImgIdx: (i: number) => void;
-  loadingDetail: boolean;
-  detailErr: string | null;
   onClose: () => void;
   onPrev: () => void;
   onNext: () => void;
@@ -19,14 +18,15 @@ type Props = {
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
+/* ---------- small tile with debug overlay ---------- */
 function CardTile({
   index,
-  path,
+  photo,
   onClick,
   showDebugOverlay,
 }: {
   index: number;
-  path: string;
+  photo: PhotoRef;
   onClick: () => void;
   showDebugOverlay: boolean;
 }) {
@@ -36,12 +36,12 @@ function CardTile({
     if (!wrapperRef.current) return;
     const r = wrapperRef.current.getBoundingClientRect();
     console.log(
-      `[Tile ${index}] size: ${Math.round(r.width)}x${Math.round(r.height)} visible=${r.width > 0 && r.height > 0
-      }`
+      `[Tile ${index}] size: ${Math.round(r.width)}x${Math.round(r.height)} visible=${r.width > 0 && r.height > 0}`,
     );
   }, []);
 
-  const busted = `${path}${path.includes("?") ? "&" : "?"}cb=${Date.now()}`;
+  // cache-bust for dev only (optional)
+  const busted = `${photo.href}${photo.href.includes("?") ? "&" : "?"}cb=${Date.now()}`;
 
   return (
     <button
@@ -56,17 +56,14 @@ function CardTile({
       ref={wrapperRef}
       style={{
         width: "100%",
-        paddingTop: "100%", // square
+        paddingTop: "100%",
         position: "relative",
         borderRadius: "12px",
         overflow: "hidden",
-        // CHECKERBOARD so even pure white images are visible
-        background:
-          "repeating-conic-gradient(#e5e5e5 0% 25%, #f8f8f8 0% 50%) 50% / 16px 16px",
+        background: "repeating-conic-gradient(#e5e5e5 0% 25%, #f8f8f8 0% 50%) 50% / 16px 16px",
         border: "2px solid rgba(0,0,0,0.15)",
       }}
     >
-      {/* index badge */}
       <span
         style={{
           position: "absolute",
@@ -82,7 +79,6 @@ function CardTile({
         #{index + 1}
       </span>
 
-      {/* subtle inner shadow to increase contrast for very bright images */}
       <span
         aria-hidden
         style={{
@@ -95,18 +91,16 @@ function CardTile({
       />
 
       <Image
-        src={busted}
-        alt=""
+        src={busted}                // <-- uses backend streaming endpoint
+        alt={photo.caption ?? ""}
         fill
         sizes="(max-width:768px) 50vw, (max-width:1024px) 33vw, 25vw"
         priority={index < 4}
-        unoptimized
         style={{ objectFit: "cover", objectPosition: "center", display: "block" }}
         onLoad={() => console.log(`[IMG] painted: ${busted}`)}
         onError={(e) => console.error(`[IMG] error: ${busted}`, e)}
       />
 
-      {/* Debug overlay with filename so you can visually confirm */}
       {showDebugOverlay && (
         <div
           aria-hidden
@@ -126,50 +120,64 @@ function CardTile({
             overflow: "hidden",
             whiteSpace: "nowrap",
           }}
-          title={path}
+          title={photo.href}
         >
-          {path}
+          {photo.href}
         </div>
       )}
     </button>
   );
 }
 
+/* ---------- modal ---------- */
 export default function PatirtisModalExpanded({
   selected,
-  gallery,
   imgIdx,
   setImgIdx,
-  loadingDetail,
-  detailErr,
   onClose,
 }: Props) {
   const [mounted, setMounted] = useState(false);
-  const [showDebugOverlay, setShowDebugOverlay] = useState(true); // keep on until you’re happy
+  const [showDebugOverlay, setShowDebugOverlay] = useState(true);
+  const [photos, setPhotos] = useState<PhotoRef[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
 
+  useEffect(() => setMounted(true), []);
+
+
+
+  // Fetch photos from backend GET /projektai/:id/fotos
   useEffect(() => {
-    setMounted(true);
-    console.log("[PatirtisModalExpanded] Mounted modal component");
-  }, []);
+    if (!selected) return;
+    setLoading(true);
+    setErr(null);
+    console.log(`[Modal] fetching photos for projektas ${selected.id}`);
 
-  useEffect(() => {
-    if (selected) {
-      console.log("[PatirtisModalExpanded] Selected project:", selected.title);
-      console.log("[PatirtisModalExpanded] Gallery length:", gallery.length);
-      console.log("[PatirtisModalExpanded] Gallery contents:", gallery);
-    }
-  }, [selected, gallery]);
+    const url = `${API}/projektai/${selected.id}/fotos`;
+      console.log("[Modal] fetching:", url);
+    fetch(url, { cache: "no-store" })
+      .then(async (r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const data = (await r.json()) as { photos: PhotoRef[] };
+        console.log("[Modal] API photos:", data.photos);
+        setPhotos(data.photos);
+      })
+      .catch((e) => {
+        console.error("[Modal] photos fetch failed:", e);
+        setErr(String(e));
+      })
+      .finally(() => setLoading(false));
+  }, [selected]);
 
-  // quick hotkey (press 'd') to toggle filename overlay
+  // Debug toggle
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === "d") {
-        setShowDebugOverlay((v) => !v);
-      }
+      if (e.key.toLowerCase() === "d") setShowDebugOverlay((v) => !v);
+      if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [onClose]);
 
   if (!mounted || !selected) return null;
 
@@ -179,16 +187,8 @@ export default function PatirtisModalExpanded({
       <div
         aria-hidden="true"
         className="fixed inset-0"
-        style={{
-          position: "fixed",
-          inset: 0,
-          background: "rgba(0,0,0,0.65)",
-          zIndex: 2147483646,
-        }}
-        onClick={() => {
-          console.log("[PatirtisModalExpanded] Backdrop clicked → closing modal");
-          onClose();
-        }}
+        style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)", zIndex: 2147483646 }}
+        onClick={onClose}
       />
 
       {/* Centered modal container */}
@@ -206,12 +206,9 @@ export default function PatirtisModalExpanded({
           justifyContent: "center",
           padding: "3vw",
         }}
-        onClick={() => {
-          console.log("[PatirtisModalExpanded] Outside modal click → closing modal");
-          onClose();
-        }}
+        onClick={onClose}
       >
-        {/* Modal panel */}
+        {/* Panel */}
         <div
           style={{
             position: "relative",
@@ -229,10 +226,7 @@ export default function PatirtisModalExpanded({
         >
           {/* Close */}
           <button
-            onClick={() => {
-              console.log("[PatirtisModalExpanded] Close button clicked");
-              onClose();
-            }}
+            onClick={onClose}
             aria-label="Uždaryti"
             style={{
               position: "absolute",
@@ -251,23 +245,10 @@ export default function PatirtisModalExpanded({
           </button>
 
           {/* Content */}
-          <div
-            className="bg-white rounded-xl shadow-lg overflow-y-auto"
-            style={{
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              padding: "24px",
-              minHeight: "40vh",
-            }}
-          >
+          <div className="bg-white rounded-xl shadow-lg overflow-y-auto" style={{ flex: 1, display: "flex", flexDirection: "column", padding: "24px" }}>
             <div className="mb-4">
               <time className="text-xs text-gray-500 mb-1 block">
-                {new Date(selected.date).toLocaleDateString("lt-LT", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}
+                {new Date(selected.date).toLocaleDateString("lt-LT", { day: "numeric", month: "long", year: "numeric" })}
               </time>
               <h2 id="proj-title" className="text-center font-semibold text-gray-900">
                 {selected.title}
@@ -287,29 +268,28 @@ export default function PatirtisModalExpanded({
               </div>
             </div>
 
-            {/* Photos grid */}
-            {loadingDetail ? (
-              <div className="w-full py-16 text-center text-sm text-gray-600">
-                Įkeliamos nuotraukos…
-              </div>
-            ) : gallery.length > 0 ? (
-              <div
-                className="grid gap-[1vw] grid-cols-3 sm:grid-cols-3 md:grid-cols-4"
-                style={{ minHeight: 200 }}
-              >
-                {gallery.map((path, i) => (
-                  <Image
-                    src={`${API}${path}`}   // where path = "/photos/placeholder.jpg"
-                    alt=""
-                    fill
-                    sizes="(max-width:768px) 50vw, (max-width:1024px) 33vw, 25vw"
+            {/* Photos grid from backend GET */}
+            {loading ? (
+              <div className="w-full py-16 text-center text-sm text-gray-600">Įkeliamos nuotraukos…</div>
+            ) : err ? (
+              <div className="w-full py-10 text-center text-sm text-red-600">Klaida įkeliant nuotraukas: {err}</div>
+            ) : photos.length > 0 ? (
+              <div className="grid gap-[1vw] grid-cols-3 sm:grid-cols-3 md:grid-cols-4" style={{ minHeight: 200 }}>
+                {photos.map((p, i) => (
+                  <CardTile
+                    key={p.id}
+                    index={i}
+                    photo={p}
+                    showDebugOverlay={showDebugOverlay}
+                    onClick={() => {
+                      console.log(`[Modal] Clicked photo #${i + 1}`, p.href);
+                      setImgIdx(i);
+                    }}
                   />
                 ))}
               </div>
             ) : (
-              <div className="w-full py-10 text-center text-sm text-gray-500">
-                Nėra nuotraukų
-              </div>
+              <div className="w-full py-10 text-center text-sm text-gray-500">Nėra nuotraukų</div>
             )}
 
             {selected.link && (
@@ -319,15 +299,10 @@ export default function PatirtisModalExpanded({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-xl border px-4 py-2 hover:bg-gray-100"
-                  onClick={() => console.log("[PatirtisModalExpanded] Opened project link")}
                 >
                   Apsilankyti projekte <span aria-hidden>↗</span>
                 </a>
               </div>
-            )}
-
-            {detailErr && (
-              <p className="mt-4 text-sm text-red-600">Klaida įkeliant detales: {detailErr}</p>
             )}
           </div>
         </div>
