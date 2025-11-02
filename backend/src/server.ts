@@ -5,6 +5,7 @@ import cors from "cors";
 import path from "node:path";
 import { prisma } from "./prisma";
 import { Prisma } from "@prisma/client";
+import darbasRouter from "./routes/darbas";
 
 // Routers (the one that has the streaming image endpoints)
 import projektaiRouter from "./routes/projektai";
@@ -86,28 +87,7 @@ app.get("/contacts", async (_req, res) => {
     }
 });
 
-// Jobs
-app.get("/jobs", async (_req, res) => {
-    try {
-        const rows = await prisma.darbas.findMany({
-            orderBy: { postedAt: "desc" },
-            select: {
-                id: true,
-                title: true,
-                description: true,
-                responsibilities: true,
-                location: true,
-                type: true,
-                salary: true,
-                postedAt: true,
-            },
-        });
-        res.json(rows);
-    } catch (e) {
-        console.error(e);
-        res.status(500).json({ error: "Failed to fetch jobs" });
-    }
-});
+app.use("/darbas", darbasRouter);
 
 // About
 app.get("/about", async (_req, res) => {
@@ -190,6 +170,34 @@ app.get("/tags", async (_req, res) => {
         console.error(e);
         res.status(500).json({ error: "Failed to fetch tags" });
     }
+});
+
+// GET one job by id
+app.get("/darbas/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const job = await prisma.darbas.findUnique({
+      where: { id }, // adjust if your PK is numeric: { id: Number(id) }
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        responsibilities: true, // string[] or text? Prisma will map appropriately
+        location: true,
+        type: true,
+        salary: true,
+        postedAt: true,
+        // If you store a cover or photos in a related table, see below
+      },
+    });
+
+    if (!job) return res.status(404).json({ error: "Not found" });
+    res.json(job);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Failed to fetch job" });
+  }
 });
 
 // ===== Mount the projektai router (streaming fotos endpoints) =====

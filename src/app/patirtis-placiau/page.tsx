@@ -1,51 +1,38 @@
-"use client";
-
-import PatirtisExpanded from "@/app/components/patirtisexpanded";
-import { useRouter } from "next/navigation";
+// app/karjera-placiau/[id]/page.tsx  (SERVER)
+import Link from "next/link";
 import Image from "next/image";
+import KarjeraExpanded from "@/app/components/karjeraexpanded";
 
-export default function PatirtisPlaciauPage() {
-  const router = useRouter();
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params; // ← required in new Next
 
   return (
-    <main
-      className="scroll-smooth min-h-screen overflow-y-auto max-w-7xl mx-auto px-[4vw] py-[5vh] relative"
-      style={{ position: "relative" }}
-    >
-      <a
-        onClick={() => router.push("/#patirtis")}
-        className="hover:scale-110 transition-transform duration-200 cursor-pointer"
-        style={{
-          position: "absolute",
-          left: "12vw",
-          top: "8vh",
-        }}
+    <main className="scroll-smooth min-h-screen overflow-y-auto max-w-7xl mx-auto px-[4vw] py-[5vh] relative">
+      <Link
+        href="/#karjera"
         aria-label="Grįžti atgal"
+        className="hover:scale-110 transition-transform duration-200 cursor-pointer"
+        style={{ position: "absolute", left: "12vw", top: "8vh" }}
       >
         <Image
           src="/icons/back.svg"
           alt="Atgal"
-          width={0}
-          height={0}
-          style={{
-            width: "3vh",
-            height: "3vh",
-          }}
+          width={24}
+          height={24}
           className="hover:brightness-75"
+          style={{ width: "3vh", height: "3vh" }}
         />
-      </a>
+      </Link>
 
-      {/* Centered title with vw/vh padding */}
-      <h1
-        className="text-[3vh] font-bold text-gray-800 text-center mb-[0.4vh]"
-        style={{
-          paddingTop: "1vh",
-          paddingBottom: "0vh",
-        }}
-      >
-        Projektų galerija
+      <h1 className="text-[3vh] font-bold text-gray-800 text-center mb-[0.4vh]">
+        Karjera
       </h1>
-      <PatirtisExpanded />
+
+      <KarjeraExpanded id={id} />
     </main>
   );
 }

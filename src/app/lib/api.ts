@@ -81,6 +81,23 @@ export type KontaktasDTO = {
   updatedAt?: string;
 };
 
+export async function getJob(id: string) {
+  const res = await fetch(`${BASE}/darbas/${id}`, {
+    next: { revalidate: 60 }, // or: cache: "no-store"
+  });
+  if (!res.ok) throw new Error(`Failed to load job ${id}`);
+  return res.json() as Promise<{
+    id: string;
+    title: string;
+    description?: string | null;
+    location?: string | null;
+    type?: string | null;
+    salary?: string | null;
+    postedAt: string;
+    responsibilities: string[];
+  }>;
+}
+
 export type DarbasDTO = {
   id: string;
   title: string;
@@ -129,6 +146,3 @@ export async function getJobs(): Promise<DarbasDTO[]> {
   return api<DarbasDTO[]>("/jobs");
 }
 
-export async function getJob(id: string): Promise<DarbasDTO> {
-  return api<DarbasDTO>(`/jobs/${id}`);
-}

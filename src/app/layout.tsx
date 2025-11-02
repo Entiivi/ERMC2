@@ -33,7 +33,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   }, [])
 
   // Hide header on this page (and its subpages)
-  const hideHeader = pathname.startsWith('/patirtis-placiau')
+  const noHeaderPages = ["/patirtis-placiau", "/karjera-placiau"];
+  const hideHeader = noHeaderPages.some((p) => pathname.startsWith(p));
 
   return (
     <html lang="en">

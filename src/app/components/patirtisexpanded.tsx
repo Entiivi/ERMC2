@@ -168,11 +168,7 @@ export default function PatirtisPlaciauPage() {
       {/* Modal */}
       <PatirtisModalExpanded
         selected={selected}
-        gallery={gallery}
-        imgIdx={imgIdx}
         setImgIdx={setImgIdx}
-        loadingDetail={loadingDetail}
-        detailErr={detailErr}
         onClose={closeModal}
         onPrev={prevImg}
         onNext={nextImg}
