@@ -32,9 +32,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return () => window.removeEventListener('resize', updateHeaderHeight)
   }, [])
 
-  // Hide header on this page (and its subpages)
-  const noHeaderPages = ["/patirtis-placiau", "/karjera-placiau"];
+  // Hide header/footer on this page (and its subpages)
+  const noHeaderPages = ["/patirtis-placiau", "/karjera-placiau", "/admin"];
   const hideHeader = noHeaderPages.some((p) => pathname.startsWith(p));
+
+  const noFooterPages = ["/admin"];
+  const hideFooter = noFooterPages.some((p) => pathname.startsWith(p));
 
   return (
     <html lang="en">
@@ -72,7 +75,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* main turi padding-top, kad pradžia nebūtų po headeriu */}
         <main className="main overflow-y-auto" style={{ paddingTop: hideHeader ? '0' : 'var(--header-height-px)' }}>
           {children}
-          <Footer />
+          {!hideFooter && <Footer />}
         </main>
       </body>
     </html>

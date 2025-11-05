@@ -109,16 +109,36 @@ async function seedProjects() {
 }
 
 async function seedJobs() {
-    const rows = loadJson<Array<{ title: string; description?: string; responsibilities: any }>>(
-        "seed-karjera.json"
-    );
-    for (const j of rows) {
-        await prisma.darbas.upsert({
-            where: { title: j.title },
-            update: { description: j.description ?? "", responsibilities: j.responsibilities },
-            create: { title: j.title, description: j.description ?? "", responsibilities: j.responsibilities },
-        });
-    }
+  type SeedJob = {
+    title: string;
+    description?: string;
+    responsibilities: any;
+    location?: string;
+    type?: string;
+    salary?: string;
+    postedAt?: string; // ISO iš JSON
+  };
+
+  const rows = loadJson<SeedJob[]>("seed-karjera.json");
+
+  for (const j of rows) {
+    const baseData = {
+      title: j.title,
+      description: j.description ?? "",
+      responsibilities: j.responsibilities,
+      location: j.location ?? null,
+      type: j.type ?? null,
+      salary: j.salary ?? null,
+      // jei JSON turi postedAt – perrašom, jei ne – paliekam DB default(now())
+      ...(j.postedAt ? { postedAt: new Date(j.postedAt) } : {}),
+    };
+
+    await prisma.darbas.upsert({
+      where: { title: j.title }, // nes title yra @unique
+      update: baseData,
+      create: baseData,
+    });
+  }
 }
 
 async function seedApie() {

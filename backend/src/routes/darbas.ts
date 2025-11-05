@@ -10,17 +10,43 @@ type DarbasDTO = {
   location?: string | null;
   type?: string | null;
   salary?: string | null;
-  postedAt: string;                // ISO
-  responsibilities: string[];      // <- normalized array
+  postedAt: string;           // ISO
+  responsibilities: string[]; // normalized
 };
 
 function normalizeResponsibilities(v: JsonValue): string[] {
-  // Expect an array of strings in DB; be defensive:
-  if (Array.isArray(v)) return v.map(String);
-  if (typeof v === "string") return [v];
-  if (v && typeof v === "object" && Array.isArray((v as any).items)) {
-    return (v as any).items.map(String);
+  // defensive normalization for different JSON shapes
+  if (!v) return [];
+
+  // If array of strings → return as-is
+  if (Array.isArray(v)) {
+    return v.map((item) => {
+      if (typeof item === "string") return item;
+      if (typeof item === "object" && item !== null) {
+        // try to extract a property like text, label, value, description
+        const obj = item as Record<string, unknown>;
+        const firstKey = Object.keys(obj)[0];
+        return (
+          (typeof obj.text === "string" && obj.text) ||
+          (typeof obj.label === "string" && obj.label) ||
+          (typeof obj.value === "string" && obj.value) ||
+          (firstKey && typeof obj[firstKey] === "string" && (obj[firstKey] as string)) ||
+          JSON.stringify(obj)
+        );
+      }
+      return String(item);
+    });
   }
+
+  // If it's a plain string
+  if (typeof v === "string") return [v];
+
+  // If it's an object with an "items" array inside
+  if (typeof v === "object" && v !== null && Array.isArray((v as any).items)) {
+    return (v as any).items.map((x: any) => (typeof x === "string" ? x : JSON.stringify(x)));
+  }
+
+  // Otherwise nothing usable
   return [];
 }
 

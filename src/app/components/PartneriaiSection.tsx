@@ -22,8 +22,9 @@ export const KlientaiIrPartneriai: React.FC = () => {
     (async () => {
       try {
         setLoading(true);
-        const resp = await api<PartnersApiResp>('/partners'); 
-        const data: PartnerisDTO[] = Array.isArray(resp) ? resp : resp?.partners ?? [];
+        const resp = await fetch('http://localhost:4000/partneriai');
+        if (!resp.ok) throw new Error('Nepavyko gauti partnerių');
+        const data = await resp.json();
         if (!cancelled) setPartners(data);
       } catch (e: unknown) {
         if (!cancelled) setErr(e instanceof Error ? e.message : 'Nepavyko įkelti partnerių');
@@ -31,7 +32,9 @@ export const KlientaiIrPartneriai: React.FC = () => {
         if (!cancelled) setLoading(false);
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // nustatom pradinį scroll ir „single“ plotį begaliniam takui
@@ -134,7 +137,7 @@ export const KlientaiIrPartneriai: React.FC = () => {
   };
 
   const items = partners.length ? [...partners, ...partners, ...partners] : [];
-  
+
 
   return (
     <>
@@ -163,18 +166,20 @@ export const KlientaiIrPartneriai: React.FC = () => {
             style={{ width: '20vw', height: '40vh' }}
           >
             <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-              <Image
-                src={partner.imageSrc}
+              <img
+                src={partner.image ?? partner.imageSrc ?? "/fallback.png"}
                 alt={partner.imageAlt ?? partner.name}
-                fill
-                sizes="(max-width: 768px) 80vw, (max-width: 1200px) 40vw, 20vw"
                 draggable={false}
                 onDragStart={(e) => e.preventDefault()}
                 style={{
+                  width: '100%',
+                  height: '100%',
                   objectFit: 'cover',
                   objectPosition: 'center',
                   userSelect: 'none',
                   pointerEvents: 'none',
+                  position: 'absolute',
+                  inset: 0,
                 }}
               />
             </div>

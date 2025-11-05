@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 // ---- Types (match your new backend DTO) ----
 type DarbasDTO = {
@@ -50,7 +51,7 @@ export default function KarjeraSection() {
   }, []);
 
   return (
-    <section className="flex justify-center" id="karjera">
+    <section className=" pb-[5vh] flex justify-center" id="karjera">
       <div className="w-full max-w-2xl">
         <p className="text-left pl-[6vw]">Šiuo metu aktyviai ieškome:</p>
 
@@ -65,58 +66,64 @@ export default function KarjeraSection() {
 
           {!loading &&
             !err &&
-            jobs.map((job) => (
-              <div key={job.id} className="leading-relaxed">
-                <div>
-                  <time className="block text-xs text-gray-500">
-                    {job.postedAt
-                      ? new Date(job.postedAt).toLocaleDateString("lt-LT", {
+            <div className="mt-6 px-[6vw] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {jobs.map((job) => (
+                <div
+                  key={job.id}
+                  className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-transform duration-300 hover:scale-[1.02] cursor-pointer p-5 flex flex-col justify-between hover:border-2 hover:border-transparent hover:bg-gradient-to-br hover:from-[#14b8a6]/10 hover:to-[#0d9488]/10"
+                  onClick={() => router.push(`/karjera-placiau/${job.id}`)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      router.push(`/karjera-placiau/${job.id}`);
+                    }
+                  }}
+                  aria-label={`Plačiau apie: ${job.title}`}
+                >
+                  {/* Viršutinė kortelės dalis */}
+                  <div>
+                    <time className="block text-[2vh] text-gray-500 mb-1">
+                      {job.postedAt
+                        ? new Date(job.postedAt).toLocaleDateString("lt-LT", {
                           day: "numeric",
                           month: "long",
                           year: "numeric",
                         })
-                      : null}
-                  </time>
+                        : null}
+                    </time>
 
-                  <strong className="text-gray-900 text-[2.5vh]">{job.title}</strong>
+                    <h3 className="text-gray-900 text-[2.5vh] font-semibold">
+                      {job.title}
+                    </h3>
 
-                  {/* Optional short description */}
-                  {job.description && (
-                    <p className="text-gray-700 mt-1 text-[2vh]">{job.description}</p>
-                  )}
-
-                  {/* Optional meta row */}
-                  <div className="mt-2 text-sm text-gray-600 flex flex-wrap gap-4">
-                    {job.location && <span>Vieta: {job.location}</span>}
-                    {job.type && <span>Tipas: {job.type}</span>}
-                    {job.salary && <span>Atlyginimas: {job.salary}</span>}
+                    <div className="mt-3 text-[2vh] text-gray-600 pl-[0.5vw] flex flex-col gap-1">
+                      {job.location && <span>Vieta: {job.location}</span>}
+                      {job.type && <span>Tipas: {job.type}</span>}
+                      {job.salary && <span>Atlyginimas: {job.salary}</span>}
+                    </div>
                   </div>
 
-                  {/* Optional first 2 responsibilities */}
-                  {job.responsibilities?.length ? (
-                    <ul className="mt-3 list-disc pl-6 text-gray-800 space-y-1">
-                      {job.responsibilities.slice(0, 2).map((r, i) => (
-                        <li key={i}>{r}</li>
-                      ))}
-                    </ul>
-                  ) : null}
+                  {/* Apačia – „Plačiau“ indikacija */}
+                  <div className="mt-4 flex justify-end items-center gap-2 pr-[0.5vw]">
+                    <span className="text-[2vh] text-teal-600 font-medium transition-colors duration-300 group-hover:text-[#0d9488]">
+                      Plačiau
+                    </span>
+                    <Image
+                      src="/icons/arrow.svg"
+                      alt="Plačiau"
+                        width={0}
+                        height={0}
+                      style={{ width: "2.8vw", height: "2.8vh" }}
+                      className="brightness-0 hover:opacity-80 transition-transform duration-300 hover:translate-x-1"
+                    />
+                  </div>
                 </div>
-
-                {/* "Plačiau" button */}
-                <div className="flex justify-center mt-3 pr-[3.5vw]">
-                  <button
-                    onClick={() => router.push(`/karjera-placiau/${job.id}`)}
-                    className="hover:scale-105 hover:text-[#14b8a6] transition duration-200 px-4 py-2 cursor-pointer select-none text-gray-800 rounded-full shadow-md text-[2vh]"
-                    style={{ fontWeight: 500, letterSpacing: "0.02em" }}
-                    aria-label={`Plačiau apie: ${job.title}`}
-                  >
-                    Plačiau
-                  </button>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
+          }
         </div>
       </div>
     </section>
   );
-}
+} /* onClick={() => router.push(`/karjera-placiau/${job.id}`)} */

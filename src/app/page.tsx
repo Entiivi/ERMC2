@@ -8,6 +8,7 @@ import PatirtisSection from "@/app/components/PatirtisSection";
 import { KlientaiIrPartneriai } from "@/app/components/PartneriaiSection";
 import KarjeraSection from "@/app/components/KarjeraSection";
 import { KontaktaiSection } from "@/app/components/KontaktaiSection";
+import { ApieSection } from "@/app/components/ApieSection";
 
 export default function HomePage() {
     React.useEffect(() => {
@@ -51,21 +52,7 @@ export default function HomePage() {
 
     const apieMusContentApie = (
         <>
-            <div className="px-[3vw]">
-                <p>
-                    Jūsų partneris įgyvendinant inžinerinius projektus diegiant nestandartinius sprendimus.
-                </p>
-                <p>
-                    Esame įmonė turinti patirties nacionaliniuose ir tarptautiniuose projektuose.
-                </p>
-                <p>
-                    Mes įsigiliname į klientų poreikius, aptariame lūkesčius ir atliekame įvariapusį projekto planavimą apimant būtinus žmogiškuosius išteklius, inžinerinius gebėjimus ir technologinius sprendimus.
-                </p>
-                <p>
-                    Įdiegiame projekto valdymo stebėseną siekiant užtikrinti sėkmingą projekto eigą ir įgyvendinimą.
-                </p>
-
-            </div>
+            <ApieSection />
         </>
     )
 

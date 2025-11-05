@@ -1,48 +1,82 @@
 [
   {
+    "id": "cmhe4xkrv002dv4esoj88unxl",
     "title": "Darbų vadovas",
     "description": "Atsakingas už statybos darbų organizavimą, kokybės užtikrinimą, saugą ir komunikaciją objekte.",
+    "location": "Vilnius, Kalvarijų g. 34",
+    "type": "Hybrid",
+    "salary": "3200 eur bruto",
+    "postedAt": "2025-10-31T00:48:41.323Z",
     "responsibilities": [
-      {
-        "title": "Darbų organizavimas ir kontrolė",
-        "items": [
-          "Vadovavimas statybos darbų vykdymui objekte pagal projektą, grafiką ir techninius reikalavimus",
-          "Darbo jėgos ir mechanizmų paskirstymas objekte",
-          "Statybos darbų eigos koordinavimas, užtikrinant nuoseklumą tarp įvairių darbų etapų"
-        ]
-      },
-      {
-        "title": "Kokybės ir terminų užtikrinimas",
-        "items": [
-          "Statybos darbų vykdymas laikantis kokybės standartų, projektinių sprendinių ir techninių reglamentų",
-          "Terminų kontrolė ir priemonių ėmimasis, jei kyla vėlavimo rizika",
-          "Atliekamų darbų dokumentavimas (aktai, žurnalai ir kt.)"
-        ]
-      },
-      {
-        "title": "Darbo sauga ir aplinkosauga",
-        "items": [
-          "Darbų saugos reikalavimų užtikrinimas objekte",
-          "Rizikų vertinimas ir prevencinių veiksmų taikymas",
-          "Atsakomybė už tvarką ir švarą statybvietėje"
-        ]
-      },
-      {
-        "title": "Bendradarbiavimas ir komunikacija",
-        "items": [
-          "Bendravimas su projektuotojais, užsakovais, subrangovais ir technine priežiūra",
-          "Reikalingos informacijos ir techninių sprendimų derinimas",
-          "Komandos koordinavimas, darbuotojų instruktavimas ir motyvavimas"
-        ]
-      },
-      {
-        "title": "Medžiagų ir resursų valdymas",
-        "items": [
-          "Statybinių medžiagų planavimas",
-          "Tiekimo proceso derinimas ir medžiagų kokybės tikrinimas",
-          "Sandėliavimo ir medžiagų apskaitos priežiūra"
-        ]
-      }
+      "Darbų organizavimas ir kontrolė",
+      "Kokybės ir terminų užtikrinimas",
+      "Darbo sauga ir aplinkosauga",
+      "Bendradarbiavimas ir komunikacija",
+      "Medžiagų ir resursų valdymas"
+    ]
+  },
+  {
+    "id": "cmhe5abcx001dv4esoj88unxa",
+    "title": "Elektrikas",
+    "description": "Atsakingas už elektros tinklų įrengimą, priežiūrą ir remontą pramoniniuose bei komerciniuose objektuose.",
+    "location": "Kaunas, Raudondvario pl. 101",
+    "type": "On-site",
+    "salary": "2500 eur bruto",
+    "postedAt": "2025-10-31T10:15:00.000Z",
+    "responsibilities": [
+      "Elektros sistemų montavimas ir remontas",
+      "Gedimų paieška ir šalinimas",
+      "Darbas pagal elektros schemas",
+      "Techninės dokumentacijos pildymas",
+      "Saugos reikalavimų laikymasis"
+    ]
+  },
+  {
+    "id": "cmhe5abcy002dv4esoj88unxb",
+    "title": "Projektų vadovas",
+    "description": "Koordinuoja projektų vykdymą nuo planavimo iki įgyvendinimo, bendrauja su klientais ir užtikrina rezultatų kokybę.",
+    "location": "Vilnius, Ukmergės g. 369",
+    "type": "Hybrid",
+    "salary": "3800 eur bruto",
+    "postedAt": "2025-11-02T08:42:10.000Z",
+    "responsibilities": [
+      "Projektų planavimas ir biudžeto sudarymas",
+      "Darbo su klientais ir rangovais koordinavimas",
+      "Projekto eigos stebėsena ir ataskaitų teikimas",
+      "Komandos darbo organizavimas",
+      "Terminų ir kokybės užtikrinimas"
+    ]
+  },
+  {
+    "id": "cmhe5abcz003dv4esoj88unxc",
+    "title": "Sąmatininkas",
+    "description": "Rengia ir tikrina statybos sąmatas, analizuoja techninę dokumentaciją bei padeda užtikrinti projekto finansinį efektyvumą.",
+    "location": "Klaipėda, Baltijos pr. 12",
+    "type": "Remote",
+    "salary": "2700 eur bruto",
+    "postedAt": "2025-11-03T09:25:30.000Z",
+    "responsibilities": [
+      "Sąmatų rengimas pagal techninius projektus",
+      "Kainų pasiūlymų analizė ir vertinimas",
+      "Bendradarbiavimas su tiekėjais ir rangovais",
+      "Projekto biudžeto kontrolė",
+      "Ataskaitų teikimas vadovybei"
+    ]
+  },
+  {
+    "id": "cmhe5abcd004dv4esoj88unxd",
+    "title": "Inžinierius konstruktorius",
+    "description": "Kuria techninius sprendimus, rengia brėžinius ir analizuoja konstrukcinius projektus, siekiant optimizuoti statybos procesus.",
+    "location": "Vilnius, Savanorių pr. 178",
+    "type": "Hybrid",
+    "salary": "3400 eur bruto",
+    "postedAt": "2025-11-01T13:05:20.000Z",
+    "responsibilities": [
+      "Techninių brėžinių rengimas ir koregavimas",
+      "Konstrukcinių sprendimų kūrimas",
+      "Inžinerinių skaičiavimų atlikimas",
+      "Bendradarbiavimas su architektais ir projektuotojais",
+      "Techninės dokumentacijos rengimas"
     ]
   }
 ]

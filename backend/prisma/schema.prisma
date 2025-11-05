@@ -7,10 +7,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+/* ===== Multilingual support ===== */
+
+enum Lang {
+  LT
+  EN
+}
+
 /* ===== Core: Projektai + Žymos (Tags) ===== */
 
 model Projektas {
   id        String        @id @default(cuid())
+  lang      Lang          @default(LT)   // <--- PRIDĖTA
   title     String        @unique
   date      DateTime
   cover     String
@@ -26,6 +34,7 @@ model Projektas {
 
 model Tag {
   id         String         @id @default(cuid())
+  lang       Lang           @default(LT)  // <--- PRIDĖTA (LT/EN tag'ai atskirai)
   name       String         @unique
   projektai  ProjektasTag[]
   paraiskos  CvTag[]
@@ -57,6 +66,7 @@ model Photo {
 
 model Apie {
   id        String   @id @default(cuid())
+  lang      Lang     @default(LT)   // <--- PRIDĖTA
   title     String   @unique 
   content   String
   order     Int
@@ -67,6 +77,7 @@ model Apie {
 
 model Paslauga {
   id        String   @id @default(cuid())
+  lang      Lang     @default(LT)   // <--- PRIDĖTA
   title     String   @unique
   subtitle  String
   iconUrl   String
@@ -79,6 +90,7 @@ model Paslauga {
 
 model Partneris {
   id        String   @id @default(cuid())
+  lang      Lang     @default(LT)   // <--- PRIDĖTA
   name      String   @unique
   imageSrc  String
   imageAlt  String?
@@ -90,6 +102,7 @@ model Partneris {
 
 model Kontaktas {
   id        String   @id @default(cuid())
+  lang      Lang     @default(LT)   // <--- PRIDĖTA
   label     String   @unique
   value     String
   copyable  Boolean  @default(false)
@@ -127,6 +140,7 @@ model CvTag {
 
 model Darbas {
   id               String   @id @default(cuid())
+  lang             Lang     @default(LT)   // <--- PRIDĖTA
   title            String   @unique
   location         String?
   type             String?
@@ -135,4 +149,43 @@ model Darbas {
   salary           String?
   postedAt         DateTime @default(now())
   updatedAt        DateTime @updatedAt
+}
+
+/* ===== Hero photos ===== */
+
+model HeroPhoto {
+  id        String   @id @default(cuid())
+  lang      Lang     @default(LT)       // which language this photo belongs to
+  imageUrl  String                        // path or URL, e.g. "/photos/hero1.png"
+  alt       String?                       // alt text
+  order     Int       @default(0)         // to control order if multiple hero slides
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+/* ===== Icons (generic, can be used anywhere) ===== */
+
+model Icon {
+  id        String   @id @default(cuid())
+  name      String   @unique              // e.g. "engineering", "phone", "email"
+  imageUrl  String                        // path to icon file
+  alt       String?                       // accessibility label
+  category  String?                       // optional (e.g. "services", "contacts")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+/* ===== Apie (About Us) photos ===== */
+
+model ApiePhoto {
+  id        String   @id @default(cuid())
+  lang      Lang     @default(LT)
+  imageUrl  String
+  alt       String?
+  caption   String?                       // optional caption text
+  order     Int       @default(0)
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }

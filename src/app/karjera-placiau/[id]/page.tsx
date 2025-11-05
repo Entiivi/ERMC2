@@ -3,7 +3,14 @@ import Link from "next/link";
 import Image from "next/image";
 import KarjeraExpanded from "@/app/components/karjeraexpanded";
 
-export default function Page({ params }: { params: { id: string } }) {
+type PageProps = {
+  params: Promise<{ id: string }>;
+};
+
+export default async function Page({ params }: PageProps) {
+  // 👇 Next.js now requires you to await params
+  const { id } = await params;
+
   return (
     <main className="scroll-smooth min-h-screen overflow-y-auto max-w-7xl mx-auto px-[4vw] py-[5vh] relative">
       <Link
@@ -22,10 +29,12 @@ export default function Page({ params }: { params: { id: string } }) {
         />
       </Link>
 
-      <h1 className="text-[3vh] font-bold text-gray-800 text-center mb-[0.4vh]">Karjera</h1>
+      <h1 className="text-[3vh] font-bold text-gray-800 text-center mb-[0.4vh]">
+        Karjera
+      </h1>
 
       {/* Server component expects id */}
-      <KarjeraExpanded id={params.id} />
+      <KarjeraExpanded id={id} />
     </main>
   );
 }

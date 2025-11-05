@@ -24,8 +24,10 @@ export async function api<T>(path: string, init?: RequestInit): Promise<T> {
 export type PartnerisDTO = {
   id: string;
   name: string;
-  imageSrc: string;
+  imageSrc?: string;      // path from DB (optional now)
+  image?: string;         // base64 from API
   imageAlt?: string | null;
+  lang?: 'LT' | 'EN';
   createdAt?: string;
   updatedAt?: string;
 };

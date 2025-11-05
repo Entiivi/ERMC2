@@ -43,18 +43,18 @@ export default async function KarjeraExpanded({ id }: Props) {
             year: "numeric",
           })}
         </time>
-        <h1 className="text-3xl font-semibold text-gray-900">{job.title}</h1>
+        <h1 className="text-[2.5vh] font-semibold text-gray-900">{job.title}</h1>
       </div>
 
       {/* Description */}
       {job.description && (
-        <p className="mt-3 text-gray-700 leading-7 whitespace-pre-wrap">
+        <p className="text-[2vh] mt-3 text-gray-700 leading-7 whitespace-pre-wrap">
           {job.description}
         </p>
       )}
 
       {/* Meta */}
-      <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-600">
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 text-[1.5vh] text-gray-600">
         {job.location && (
           <div>
             <span className="font-medium">Vieta:</span> {job.location}
@@ -75,8 +75,8 @@ export default async function KarjeraExpanded({ id }: Props) {
       {/* Responsibilities */}
       {job.responsibilities?.length ? (
         <section className="mt-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">Atsakomybės</h2>
-          <ul className="list-disc pl-6 space-y-1 text-gray-800">
+          <h2 className="text-[2vh] font-semibold text-gray-900 mb-2">Atsakomybės</h2>
+          <ul className="text-[1.5vh] list-disc pl-6 space-y-1 text-gray-800">
             {job.responsibilities.map((item, i) => (
               <li key={i}>{item}</li>
             ))}

@@ -66,14 +66,13 @@ export default function PatirtisSection() {
                             flex: "0 0 calc((100% - 4vw) / 2)",
                             maxWidth: "calc((100% - 4vw) / 2)",
                         }}
-                        onClick={() => router.push(`/patirtis-placiau/${p.id}`)}
+                        onClick={() => router.push(`/patirtis-placiau`)}
                         role="button"
                         tabIndex={0}
                         onKeyDown={(e) => {
                             if (e.key === "Enter" || e.key === " ")
-                                router.push(`/patirtis-placiau/${p.id}`);
+                                router.push(`/patirtis-placiau`);
                         }}
-                        aria-label={`Atidaryti projektą: ${p.title}`}
                     >
                         {/* Viršelis */}
                         <div

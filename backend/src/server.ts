@@ -6,6 +6,10 @@ import path from "node:path";
 import { prisma } from "./prisma";
 import { Prisma } from "@prisma/client";
 import darbasRouter from "./routes/darbas";
+import paraiskosRouter from "./routes/paraiskos";
+import adminRouter from "./routes/admin";
+import partneriaiRouter from "./routes/partneriai";
+import apieRouter from "./routes/apie";
 
 // Routers (the one that has the streaming image endpoints)
 import projektaiRouter from "./routes/projektai";
@@ -88,6 +92,8 @@ app.get("/contacts", async (_req, res) => {
 });
 
 app.use("/darbas", darbasRouter);
+app.use("/apie", apieRouter);
+app.use("/partneriai", partneriaiRouter);
 
 // About
 app.get("/about", async (_req, res) => {
@@ -177,7 +183,7 @@ app.get("/darbas/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    const job = await prisma.darbas.findUnique({
+       const job = await prisma.darbas.findUnique({
       where: { id }, // adjust if your PK is numeric: { id: Number(id) }
       select: {
         id: true,
@@ -200,8 +206,14 @@ app.get("/darbas/:id", async (req, res) => {
   }
 });
 
-// ===== Mount the projektai router (streaming fotos endpoints) =====
+//  fotos endpoint
 app.use("/projektai", projektaiRouter);
+//  paraiska endpoints
+app.use("/paraiskos", paraiskosRouter);
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+
+//  admin endpoints
+app.use("/admin", adminRouter);
 
 // Diagnostics (show DB path on startup import)
 console.log("DATABASE_URL =", process.env.DATABASE_URL);

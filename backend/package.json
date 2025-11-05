@@ -10,7 +10,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "migrate": "prisma migrate dev",
-    "seed": "prisma db seed"
+    "seed": "prisma db seed",
+    "seed2": "ts-node dataseeds/seed2.ts",
+    "seed3": "ts-node dataseeds/seed3.ts"
   },
   "keywords": [],
   "author": "",
@@ -21,14 +23,17 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "mime-types": "^3.0.1",
+    "multer": "^2.0.2",
     "undici": "^7.16.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/mime-types": "^3.0.1",
+    "@types/multer": "^2.0.0",
     "prisma": "^6.16.3",
     "ts-node-dev": "^2.0.0",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.2"
   }
 }
