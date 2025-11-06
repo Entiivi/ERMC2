@@ -2,12 +2,15 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { api, ProjectDTO } from "@/app/lib/api";
-import PatirtisModalExpanded from "@/app/components/patirtisModalExpanded"; // modal component
-import type { FullProjectDTO } from "@/app/lib/api"; // if you centralized it there
+import PatirtisModalExpanded from "@/app/components/patirtisModalExpanded";
+import type { FullProjectDTO } from "@/app/lib/api";
+import { useLanguage } from "@/app/kalbos/LanguageContext"; // 👈 PRIDĖTA
 
 type ProjectsApiResp = ProjectDTO[] | { projects: ProjectDTO[]; tags?: string[] };
 
 export default function PatirtisPlaciauPage() {
+  const { lang } = useLanguage(); // 👈 AKTYVI KALBA (LT / EN)
+
   const [data, setData] = useState<ProjectDTO[]>([]);
   const [allTags, setAllTags] = useState<string[]>([]);
   const [active, setActive] = useState<string>("Visi");
@@ -27,20 +30,25 @@ export default function PatirtisPlaciauPage() {
     (async () => {
       try {
         setLoading(true);
-        const res = await api<ProjectsApiResp>("/projects");
+        setErr(null);
+
+        // 👇 siunčiam kalbą į backendą
+        const res = await api<ProjectsApiResp>(`/projects?lang=${lang}`);
         if (cancelled) return;
+
         const projects = Array.isArray(res) ? res : res.projects ?? [];
         const uniqueTags = Array.from(new Set(projects.flatMap((p) => p.tags))).sort();
-        setAllTags(["Visi", ...uniqueTags]);
+
+        setAllTags(["Visi", ...uniqueTags]); // filtrų label'iai – kol kas LT, jei reikės, išversim atskirai
         setData(projects);
       } catch (e: any) {
-        if (!cancelled) setErr(e?.message ?? "Nepavyko įkelti duomenų");
+        if (!cancelled) setErr(e?.message ?? (lang === "EN" ? "Failed to load data" : "Nepavyko įkelti duomenų"));
       } finally {
         if (!cancelled) setLoading(false);
       }
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [lang]); // 👈 kai pasikeičia kalba, persikrauna projektų sąrašas
 
   const filtered = useMemo(() => {
     if (active === "Visi") return data;
@@ -71,7 +79,6 @@ export default function PatirtisPlaciauPage() {
     try {
       const full = await api<FullProjectDTO>(`/projects/${projectId}`);
 
-      // Build gallery strictly from backend photos first, else cover
       const photoPaths = (full.photos ?? []).map(p => toPhotoPath(p.url));
       const coverPath = toPhotoPath(full.cover);
       const gallery = photoPaths.length ? photoPaths : [coverPath];
@@ -79,7 +86,7 @@ export default function PatirtisPlaciauPage() {
       setSelected(full);
       setGallery(gallery);
     } catch (e: any) {
-      setDetailErr(e?.message ?? "Nepavyko įkelti projekto");
+      setDetailErr(e?.message ?? (lang === "EN" ? "Failed to load project" : "Nepavyko įkelti projekto"));
     } finally {
       setLoadingDetail(false);
     }
@@ -98,7 +105,10 @@ export default function PatirtisPlaciauPage() {
     setImgIdx((i) => (gallery.length ? (i - 1 + gallery.length) % gallery.length : 0));
 
   return (
-    <main className="min-h-screen overflow-y-auto max-w-7xl mx-auto px-[4vw] py-[6vh]" style={{ overflowX: "hidden" }}>
+    <main
+      className="min-h-screen overflow-y-auto max-w-7xl mx-auto px-[4vw] py-[6vh]"
+      style={{ overflowX: "hidden" }}
+    >
       {allTags.length > 0 && (
         <div className="flex flex-wrap items-center justify-center gap-10vw mb-6 pl-3vw">
           {allTags.map((t) => (
@@ -111,13 +121,17 @@ export default function PatirtisPlaciauPage() {
               style={{ padding: "1vw", paddingBottom: "3vh" }}
               aria-pressed={active === t}
             >
-              {t}
+              {t} {/* jei reikės, vėliau galima daryti, pvz.: t === "Visi" ? (lang==="EN"?"All":"Visi") : t */}
             </a>
           ))}
         </div>
       )}
 
-      {loading && <p className="text-sm text-gray-500">Kraunama…</p>}
+      {loading && (
+        <p className="text-sm text-gray-500">
+          {lang === "EN" ? "Loading…" : "Kraunama…"}
+        </p>
+      )}
       {err && <p className="text-sm text-red-600">{err}</p>}
 
       <div
@@ -141,20 +155,33 @@ export default function PatirtisPlaciauPage() {
             role="button"
             tabIndex={0}
             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") handleOpen(p.id); }}
-            aria-label={`Atidaryti projektą: ${p.title}`}
+            aria-label={
+              lang === "EN"
+                ? `Open project: ${p.title}`
+                : `Atidaryti projektą: ${p.title}`
+            }
           >
             <div className="p-4">
               <time className="text-[1.5vh] text-gray-500 mb-2 block">
-                {new Date(p.date).toLocaleDateString("lt-LT", { day: "numeric", month: "long", year: "numeric" })}
+                {new Date(p.date).toLocaleDateString(
+                  lang === "EN" ? "en-GB" : "lt-LT",
+                  { day: "numeric", month: "long", year: "numeric" }
+                )}
               </time>
-              <h3 className="text-[2vh] text-gray-800 leading-snug text-left whitespace-normal break-words sm:text-lg" style={{ fontWeight: "normal" }}>
+              <h3
+                className="text-[2vh] text-gray-800 leading-snug text-left whitespace-normal break-words sm:text-lg"
+                style={{ fontWeight: "normal" }}
+              >
                 {p.title}
               </h3>
 
               {!!p.tech?.length && (
                 <div className="mt-3 flex flex-wrap gap-2">
                   {p.tech.slice(0, 4).map((t, i) => (
-                    <span key={`${p.id}-tech-${i}`} className="text-[5px] px-2 py-0.5 rounded bg-gray-100 border">
+                    <span
+                      key={`${p.id}-tech-${i}`}
+                      className="text-[5px] px-2 py-0.5 rounded bg-gray-100 border"
+                    >
                       {t}
                     </span>
                   ))}

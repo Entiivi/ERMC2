@@ -10,19 +10,24 @@ type JobDTO = {
   location?: string | null;
   type?: string | null;
   salary?: string | null;
-  postedAt: string;          // ISO string from API
+  postedAt: string;           // ISO string from API
   responsibilities: string[]; // normalized in API
-  cover?: string | null;     // optional, if you add later
-  link?: string | null;      // optional, if you add later
+  cover?: string | null;
+  link?: string | null;
 };
 
-type Props = { id: string };
+type LangCode = "LT" | "EN";
 
-export default async function KarjeraExpanded({ id }: Props) {
+type Props = {
+  id: string;
+  lang: LangCode;   // 👈 PRIDĖTA
+};
+
+export default async function KarjeraExpanded({ id, lang }: Props) {
   let job: JobDTO | null = null;
 
   try {
-    job = await getJob(id);      // should call /darbas/:id under the hood
+    job = await getJob(id); // /darbas/:id – ID jau „kalbiškas“, todėl lang nereikia
   } catch (e) {
     console.error("getJob failed:", e);
     job = null;
@@ -32,16 +37,24 @@ export default async function KarjeraExpanded({ id }: Props) {
     notFound();
   }
 
+  const isEN = lang === "EN";
+
   return (
     <main className="max-w-3xl mx-auto px-[4vw] py-[6vh]">
+      <p className="text-xs text-red-500 mb-2">
+        lang = {lang}, isEN = {String(isEN)}
+      </p>
       {/* Title + date */}
       <div className="mb-3">
         <time className="block text-xs text-gray-500">
-          {new Date(job.postedAt).toLocaleDateString("lt-LT", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          })}
+          {new Date(job.postedAt).toLocaleDateString(
+            isEN ? "en-GB" : "lt-LT",
+            {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            }
+          )}
         </time>
         <h1 className="text-[2.5vh] font-semibold text-gray-900">{job.title}</h1>
       </div>
@@ -57,17 +70,26 @@ export default async function KarjeraExpanded({ id }: Props) {
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 text-[1.5vh] text-gray-600">
         {job.location && (
           <div>
-            <span className="font-medium">Vieta:</span> {job.location}
+            <span className="font-medium">
+              {isEN ? "Location:" : "Vieta:"}
+            </span>{" "}
+            {job.location}
           </div>
         )}
         {job.type && (
           <div>
-            <span className="font-medium">Tipas:</span> {job.type}
+            <span className="font-medium">
+              {isEN ? "Type:" : "Tipas:"}
+            </span>{" "}
+            {job.type}
           </div>
         )}
         {job.salary && (
           <div>
-            <span className="font-medium">Atlyginimas:</span> {job.salary}
+            <span className="font-medium">
+              {isEN ? "Salary:" : "Atlyginimas:"}
+            </span>{" "}
+            {job.salary}
           </div>
         )}
       </div>
@@ -75,7 +97,9 @@ export default async function KarjeraExpanded({ id }: Props) {
       {/* Responsibilities */}
       {job.responsibilities?.length ? (
         <section className="mt-8">
-          <h2 className="text-[2vh] font-semibold text-gray-900 mb-2">Atsakomybės</h2>
+          <h2 className="text-[2vh] font-semibold text-gray-900 mb-2">
+            {isEN ? "Responsibilities" : "Atsakomybės"}
+          </h2>
           <ul className="text-[1.5vh] list-disc pl-6 space-y-1 text-gray-800">
             {job.responsibilities.map((item, i) => (
               <li key={i}>{item}</li>
@@ -86,7 +110,9 @@ export default async function KarjeraExpanded({ id }: Props) {
 
       {/* CV submit form */}
       <section className="mt-10">
-        <h2 className="text-xl font-semibold text-gray-900 mb-3">Pateikti CV</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-3">
+          {isEN ? "Submit your CV" : "Pateikti CV"}
+        </h2>
         <CvForm jobId={job.id} />
       </section>
 
@@ -99,7 +125,8 @@ export default async function KarjeraExpanded({ id }: Props) {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-xl border px-4 py-2 hover:bg-gray-100"
           >
-            Plačiau apie poziciją <span aria-hidden>↗</span>
+            {isEN ? "More about the position" : "Plačiau apie poziciją"}{" "}
+            <span aria-hidden>↗</span>
           </a>
         </div>
       )}

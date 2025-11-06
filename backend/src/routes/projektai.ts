@@ -1,10 +1,13 @@
 import { Router } from "express";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Lang } from "@prisma/client"; // 👈 PRIDĖTA Lang
 import path from "node:path";
 import fs from "node:fs/promises";
 import { createReadStream } from "node:fs";
 import { Writable } from "node:stream";
-import { ReadableStream as NodeWebReadable, WritableStream as NodeWebWritable } from "node:stream/web";
+import {
+  ReadableStream as NodeWebReadable,
+  WritableStream as NodeWebWritable,
+} from "node:stream/web";
 import { lookup as getType } from "mime-types";
 
 const router = Router();
@@ -14,13 +17,24 @@ const PHOTOS_DIR = path.join(__dirname, "../uploads/photos");
 
 router.get("/__ping", (_req, res) => res.send("projektai ok"));
 
-// List all projects (id + title)
-router.get("/", async (_req, res) => {
-  const rows = await prisma.projektas.findMany({
-    select: { id: true, title: true },
-    orderBy: { updatedAt: "desc" },
-  });
-  res.json({ count: rows.length, projects: rows });
+// LIST: visi projektai (šiuo metu tik id+title) su lang filtru
+// GET /projektai?lang=LT arba /projektai?lang=EN
+router.get("/", async (req, res) => {
+  try {
+    const queryLang = (req.query.lang as string | undefined)?.toUpperCase();
+    const lang: Lang = queryLang === "EN" ? Lang.EN : Lang.LT; // default LT
+
+    const rows = await prisma.projektas.findMany({
+      where: { lang }, // 👈 filtruojam pagal kalbą
+      select: { id: true, title: true },
+      orderBy: { updatedAt: "desc" },
+    });
+
+    res.json({ count: rows.length, projects: rows });
+  } catch (e) {
+    console.error("GET /projektai failed:", e);
+    res.status(500).json({ error: "Nepavyko gauti projektų" });
+  }
 });
 
 function safeJoinPhotos(relativeOrRooted: string) {
@@ -33,23 +47,23 @@ function safeJoinPhotos(relativeOrRooted: string) {
 }
 
 function baseUrl(req: any) {
-  return (process.env.PUBLIC_BASE_URL ||
-    `${req.protocol}://${req.get("host") || "localhost:4000"}`).replace(/\/$/, "");
+  return (
+    process.env.PUBLIC_BASE_URL ||
+    `${req.protocol}://${req.get("host") || "localhost:4000"}`
+  ).replace(/\/$/, "");
 }
 
-/** LIST: returns API hrefs (use these in <Image src=...>) */
+/** LIST photos for one project: returns API hrefs (use these in <Image src=...>) */
 router.get("/:id/fotos", async (req, res) => {
   const { id } = req.params;
 
   try {
-    //Verify project exists
     const exists = await prisma.projektas.findUnique({
       where: { id },
       select: { id: true },
     });
     if (!exists) return res.status(404).json({ error: "Projektas nerastas" });
 
-    //Fetch photos for this project
     const photos = await prisma.photo.findMany({
       where: { projektasId: id },
       orderBy: { id: "asc" },
@@ -59,11 +73,10 @@ router.get("/:id/fotos", async (req, res) => {
     const base = baseUrl(req);
     const uploadsDir = path.join(__dirname, "../../uploads/photos");
 
-    //Check if the file exists in /uploads/photos/
     const verifiedPhotos = [];
     for (const p of photos) {
-      const dbPath = (p.url || "").trim(); // e.g. "/uploads/photos/placeholder.jpg"
-      const filename = path.basename(dbPath); // placeholder.jpg
+      const dbPath = (p.url || "").trim();
+      const filename = path.basename(dbPath);
       const abs = path.join(uploadsDir, filename);
 
       try {
@@ -72,7 +85,7 @@ router.get("/:id/fotos", async (req, res) => {
           verifiedPhotos.push({
             id: p.id,
             caption: p.caption ?? null,
-            href: `${base}/uploads/photos/${filename}`, // public URL
+            href: `${base}/uploads/photos/${filename}`,
             original: dbPath,
           });
         } else {
@@ -83,7 +96,6 @@ router.get("/:id/fotos", async (req, res) => {
       }
     }
 
-    //Return only verified photos
     res.json({
       count: verifiedPhotos.length,
       photos: verifiedPhotos,
@@ -94,24 +106,38 @@ router.get("/:id/fotos", async (req, res) => {
   }
 });
 
-// List projects that HAVE photos (gives you a ready test URL)
-router.get("/debug/with-photos", async (_req, res) => {
-  const rows = await prisma.projektas.findMany({
-    select: { id: true, title: true, photos: { select: { id: true }, take: 1 } },
-    orderBy: { updatedAt: "desc" },
-  });
+// List projects that HAVE photos (debug, optionally filtered by lang)
+router.get("/debug/with-photos", async (req, res) => {
+  try {
+    const queryLang = (req.query.lang as string | undefined)?.toUpperCase();
+    const lang: Lang | undefined =
+      queryLang === "EN" ? Lang.EN : queryLang === "LT" ? Lang.LT : undefined;
 
-  const out = rows
-    .filter(r => r.photos.length > 0)
-    .map(r => ({
-      id: r.id,
-      title: r.title,
-      samplePhotoId: r.photos[0].id,
-      listUrl: `/projektai/${r.id}/fotos`,
-      sampleHref: `/projektai/${r.id}/fotos/${r.photos[0].id}`,
-    }));
+    const rows = await prisma.projektas.findMany({
+      where: lang ? { lang } : undefined, // jei ?lang nėra, rodom viską
+      select: {
+        id: true,
+        title: true,
+        photos: { select: { id: true }, take: 1 },
+      },
+      orderBy: { updatedAt: "desc" },
+    });
 
-  res.json({ count: out.length, projects: out });
+    const out = rows
+      .filter((r) => r.photos.length > 0)
+      .map((r) => ({
+        id: r.id,
+        title: r.title,
+        samplePhotoId: r.photos[0].id,
+        listUrl: `/projektai/${r.id}/fotos`,
+        sampleHref: `/projektai/${r.id}/fotos/${r.photos[0].id}`,
+      }));
+
+    res.json({ count: out.length, projects: out });
+  } catch (e) {
+    console.error("GET /projektai/debug/with-photos failed:", e);
+    res.status(500).json({ error: "Nepavyko gauti debug duomenų" });
+  }
 });
 
 /** BINARY: streams bytes (remote via fetch Web Streams, local via fs stream) */
@@ -141,7 +167,6 @@ router.get("/:id/fotos/:photoId", async (req, res) => {
       await (r.body as unknown as NodeWebReadable)
         .pipeTo(Writable.toWeb(res) as unknown as NodeWebWritable)
         .catch(() => res.end());
-
       return;
     }
 

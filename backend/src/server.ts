@@ -13,6 +13,7 @@ import apieRouter from "./routes/apie";
 
 // Routers (the one that has the streaming image endpoints)
 import projektaiRouter from "./routes/projektai";
+import servisaiTikraiservisai from "./routes/servisaiTikraiservisai";
 
 const allowed = [
     "http://localhost:3000",
@@ -57,17 +58,6 @@ app.get("/health", (_req, res) => res.json({ ok: true }));
 type ProjektasWithTags = Prisma.ProjektasGetPayload<{
     include: { tags: { include: { tag: true } } }
 }>;
-
-// Services
-app.get("/services", async (_req, res) => {
-    try {
-        const rows = await prisma.paslauga.findMany({ orderBy: { title: "asc" } });
-        res.json(rows);
-    } catch (e) {
-        console.error(e);
-        res.status(500).json({ error: "Failed to fetch services" });
-    }
-});
 
 // Partners
 app.get("/partners", async (_req, res) => {
@@ -180,30 +170,30 @@ app.get("/tags", async (_req, res) => {
 
 // GET one job by id
 app.get("/darbas/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
+    try {
+        const { id } = req.params;
 
-       const job = await prisma.darbas.findUnique({
-      where: { id }, // adjust if your PK is numeric: { id: Number(id) }
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        responsibilities: true, // string[] or text? Prisma will map appropriately
-        location: true,
-        type: true,
-        salary: true,
-        postedAt: true,
-        // If you store a cover or photos in a related table, see below
-      },
-    });
+        const job = await prisma.darbas.findUnique({
+            where: { id }, // adjust if your PK is numeric: { id: Number(id) }
+            select: {
+                id: true,
+                title: true,
+                description: true,
+                responsibilities: true, // string[] or text? Prisma will map appropriately
+                location: true,
+                type: true,
+                salary: true,
+                postedAt: true,
+                // If you store a cover or photos in a related table, see below
+            },
+        });
 
-    if (!job) return res.status(404).json({ error: "Not found" });
-    res.json(job);
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Failed to fetch job" });
-  }
+        if (!job) return res.status(404).json({ error: "Not found" });
+        res.json(job);
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: "Failed to fetch job" });
+    }
 });
 
 //  fotos endpoint
@@ -211,6 +201,21 @@ app.use("/projektai", projektaiRouter);
 //  paraiska endpoints
 app.use("/paraiskos", paraiskosRouter);
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+// Leisti naršyklei matyti ikonų SVG iš kito domeno
+app.use(
+  "/uploads/icons",
+  cors({ origin: "*" }), // 👈 pridėtas CORS specialiai ikonoms
+  express.static(path.join(__dirname, "../uploads/icons"), {
+    setHeaders: (res, path) => {
+      if (path.endsWith(".svg")) {
+        res.setHeader("Content-Type", "image/svg+xml");
+        res.setHeader("Access-Control-Allow-Origin", "*");
+      }
+    },
+  })
+);
+
+app.use("/services", servisaiTikraiservisai);
 
 //  admin endpoints
 app.use("/admin", adminRouter);

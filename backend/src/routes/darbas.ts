@@ -2,28 +2,26 @@
 import { Router } from "express";
 import { prisma } from "../prisma";
 import type { JsonValue } from "@prisma/client/runtime/library";
+import { Lang } from "@prisma/client"; // <--- svarbu
 
 type DarbasDTO = {
   id: string;
+  lang: Lang;               // pridėjome
   title: string;
   description?: string | null;
   location?: string | null;
   type?: string | null;
   salary?: string | null;
-  postedAt: string;           // ISO
-  responsibilities: string[]; // normalized
+  postedAt: string;
+  responsibilities: string[];
 };
 
 function normalizeResponsibilities(v: JsonValue): string[] {
-  // defensive normalization for different JSON shapes
   if (!v) return [];
-
-  // If array of strings → return as-is
   if (Array.isArray(v)) {
     return v.map((item) => {
       if (typeof item === "string") return item;
       if (typeof item === "object" && item !== null) {
-        // try to extract a property like text, label, value, description
         const obj = item as Record<string, unknown>;
         const firstKey = Object.keys(obj)[0];
         return (
@@ -37,22 +35,17 @@ function normalizeResponsibilities(v: JsonValue): string[] {
       return String(item);
     });
   }
-
-  // If it's a plain string
   if (typeof v === "string") return [v];
-
-  // If it's an object with an "items" array inside
   if (typeof v === "object" && v !== null && Array.isArray((v as any).items)) {
     return (v as any).items.map((x: any) => (typeof x === "string" ? x : JSON.stringify(x)));
   }
-
-  // Otherwise nothing usable
   return [];
 }
 
 function mapDarbas(d: any): DarbasDTO {
   return {
     id: d.id,
+    lang: d.lang,
     title: d.title,
     description: d.description ?? null,
     location: d.location ?? null,
@@ -65,13 +58,18 @@ function mapDarbas(d: any): DarbasDTO {
 
 const r = Router();
 
-// GET /darbas  (list)
-r.get("/", async (_req, res) => {
+// GET /darbas?lang=LT arba /darbas?lang=EN
+r.get("/", async (req, res) => {
   try {
+    const queryLang = (req.query.lang as string | undefined)?.toUpperCase();
+    const lang: Lang = queryLang === "EN" ? Lang.EN : Lang.LT;
+
     const rows = await prisma.darbas.findMany({
+      where: { lang },
       orderBy: { postedAt: "desc" },
       select: {
         id: true,
+        lang: true,
         title: true,
         description: true,
         responsibilities: true,
@@ -81,20 +79,22 @@ r.get("/", async (_req, res) => {
         postedAt: true,
       },
     });
+
     res.json(rows.map(mapDarbas));
   } catch (e) {
-    console.error(e);
+    console.error("Error fetching darbas:", e);
     res.status(500).json({ error: "Failed to fetch jobs" });
   }
 });
 
-// GET /darbas/:id  (single)
+// GET /darbas/:id
 r.get("/:id", async (req, res) => {
   try {
     const row = await prisma.darbas.findUnique({
       where: { id: req.params.id },
       select: {
         id: true,
+        lang: true,
         title: true,
         description: true,
         responsibilities: true,
@@ -104,10 +104,11 @@ r.get("/:id", async (req, res) => {
         postedAt: true,
       },
     });
+
     if (!row) return res.status(404).json({ error: "Not found" });
     res.json(mapDarbas(row));
   } catch (e) {
-    console.error(e);
+    console.error("Error fetching single darbas:", e);
     res.status(500).json({ error: "Failed to fetch job" });
   }
 });

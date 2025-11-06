@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { prisma } from "../prisma";
-import { Lang } from "@prisma/client"; // <--- pridėta
+import { Lang } from "@prisma/client";
 
 const r = Router();
 

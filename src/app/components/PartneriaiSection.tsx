@@ -3,10 +3,15 @@
 import React, { useRef, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { api, PartnerisDTO } from '@/app/lib/api';
+import { useLanguage } from '@/app/kalbos/LanguageContext'; // 👈 PRIDĖTA
 
 type PartnersApiResp = PartnerisDTO[] | { partners: PartnerisDTO[] };
 
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+
 export const KlientaiIrPartneriai: React.FC = () => {
+  const { lang } = useLanguage(); // 👈 AKTYVI KALBA (LT / EN)
+
   const [partners, setPartners] = useState<PartnerisDTO[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [err, setErr] = useState<string | null>(null);
@@ -16,15 +21,18 @@ export const KlientaiIrPartneriai: React.FC = () => {
   const dragState = useRef<{ startX: number; scrollLeft: number }>({ startX: 0, scrollLeft: 0 });
   const singleWidthRef = useRef<number>(0);
 
-  // Fetch from DB via API
+  // Fetch from DB via API (su kalba)
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
         setLoading(true);
-        const resp = await fetch('http://localhost:4000/partneriai');
+        setErr(null);
+
+        const resp = await fetch(`${API}/partneriai?lang=${lang}`); // 👈 KALBA QUERY'E
         if (!resp.ok) throw new Error('Nepavyko gauti partnerių');
         const data = await resp.json();
+
         if (!cancelled) setPartners(data);
       } catch (e: unknown) {
         if (!cancelled) setErr(e instanceof Error ? e.message : 'Nepavyko įkelti partnerių');
@@ -35,7 +43,7 @@ export const KlientaiIrPartneriai: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [lang]); // 👈 kai keičiasi kalba – persikrauna partneriai
 
   // nustatom pradinį scroll ir „single“ plotį begaliniam takui
   useEffect(() => {
@@ -138,10 +146,8 @@ export const KlientaiIrPartneriai: React.FC = () => {
 
   const items = partners.length ? [...partners, ...partners, ...partners] : [];
 
-
   return (
     <>
-      {loading && <p>Kraunama…</p>}
       {err && <p style={{ color: 'crimson' }}>{err}</p>}
 
       <div
@@ -167,8 +173,8 @@ export const KlientaiIrPartneriai: React.FC = () => {
           >
             <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
               <img
-                src={partner.image ?? partner.imageSrc ?? "/fallback.png"}
-                alt={partner.imageAlt ?? partner.name}
+                src={(partner as any).image ?? (partner as any).imageSrc ?? "/fallback.png"}
+                alt={(partner as any).alt ?? (partner as any).imageAlt ?? partner.name}
                 draggable={false}
                 onDragStart={(e) => e.preventDefault()}
                 style={{

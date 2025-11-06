@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import type { FullProjectDTO } from "@/app/lib/api";
+import { useLanguage } from "@/app/kalbos/LanguageContext"; // 👈 PRIDĖTA
 
 type PhotoRef = {
   id: string;
@@ -50,11 +51,10 @@ function CardTile({ photo }: { photo: PhotoRef }) {
           objectPosition: "center",
           display: "block",
           transition: "transform 0.3s ease",
-          borderRadius: "1rem" 
+          borderRadius: "1rem",
         }}
         unoptimized
       />
-      {/* Optional overlay fade on hover */}
       <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-colors duration-300" />
     </div>
   );
@@ -66,6 +66,8 @@ export default function PatirtisModalExpanded({
   setImgIdx, // unused
   onClose,
 }: Props) {
+  const { lang } = useLanguage(); // 👈 AKTYVI KALBA (LT / EN)
+
   const [mounted, setMounted] = useState(false);
   const [photos, setPhotos] = useState<PhotoRef[]>([]);
   const [loading, setLoading] = useState(false);
@@ -160,7 +162,7 @@ export default function PatirtisModalExpanded({
           {/* Close */}
           <button
             onClick={onClose}
-            aria-label="Uždaryti"
+            aria-label={lang === "EN" ? "Close" : "Uždaryti"}
             style={{
               position: "absolute",
               right: 16,
@@ -189,11 +191,14 @@ export default function PatirtisModalExpanded({
           >
             <div className="mb-4">
               <time className="text-xs text-gray-500 mb-1 block">
-                {new Date(selected.date).toLocaleDateString("lt-LT", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}
+                {new Date(selected.date).toLocaleDateString(
+                  lang === "EN" ? "en-GB" : "lt-LT", // 👈 datos formatas pagal kalbą
+                  {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  }
+                )}
               </time>
               <h2
                 id="proj-title"
@@ -205,22 +210,29 @@ export default function PatirtisModalExpanded({
 
             <div className="rounded-xl bg-gray-50 p-4 md:p-6 mb-6">
               <div className="text-sm md:text-base leading-6 text-gray-800 whitespace-pre-wrap text-center">
-                {selected.excerpt ?? "Aprašymo nėra"}
+                {selected.excerpt ??
+                  (lang === "EN" ? "No description" : "Aprašymo nėra")}
               </div>
             </div>
 
             <div className="mb-3 flex items-end justify-between">
-              <h3 className="text-sm font-medium text-gray-900">Nuotraukos</h3>
+              <h3 className="text-sm font-medium text-gray-900">
+                {lang === "EN" ? "Photos" : "Nuotraukos"}
+              </h3>
             </div>
 
             {/* Photos grid */}
             {loading ? (
               <div className="w-full py-16 text-center text-sm text-gray-600">
-                Įkeliamos nuotraukos…
+                {lang === "EN"
+                  ? "Loading photos…"
+                  : "Įkeliamos nuotraukos…"}
               </div>
             ) : err ? (
               <div className="w-full py-10 text-center text-sm text-red-600">
-                Klaida įkeliant nuotraukas: {err}
+                {lang === "EN"
+                  ? `Error loading photos: ${err}`
+                  : `Klaida įkeliant nuotraukas: ${err}`}
               </div>
             ) : photos.length > 0 ? (
               <div
@@ -233,7 +245,7 @@ export default function PatirtisModalExpanded({
               </div>
             ) : (
               <div className="w-full py-10 text-center text-sm text-gray-500">
-                Nėra nuotraukų
+                {lang === "EN" ? "No photos" : "Nėra nuotraukų"}
               </div>
             )}
           </div>

@@ -2,22 +2,33 @@ import { Router } from "express";
 import fs from "fs";
 import path from "path";
 import { prisma } from "../prisma";
+import { Lang } from "@prisma/client"; // 👈 pridėta
 
 const r = Router();
 
-// folder containing all partner photos
-const partnerPhotoDir = path.join(__dirname, "../../uploads/homepage-photos/partneriai-photos");
+const partnerPhotoDir = path.join(
+  __dirname,
+  "../../uploads/homepage-photos/partneriai-photos"
+);
 
-// GET /partneriai
-// returns all partners with their photo bytes (base64) instead of file path
-r.get("/", async (_req, res) => {
+// GET /partneriai?lang=LT arba /partneriai?lang=EN
+r.get("/", async (req, res) => {
   try {
+    // 👇 Paimame kalbą iš query (pvz. /partneriai?lang=EN)
+    const queryLang = (req.query.lang as string | undefined)?.toUpperCase();
+    const lang: Lang = queryLang === "EN" ? Lang.EN : Lang.LT; // numatyta LT
+
+    // 👇 Filtruojam pagal kalbą
     const partners = await prisma.partneris.findMany({
+      where: { lang },
       orderBy: { name: "asc" },
     });
 
     const results = partners.map((p) => {
-      const fullPath = path.join(partnerPhotoDir, path.basename(p.imageSrc ?? ""));
+      const fullPath = path.join(
+        partnerPhotoDir,
+        path.basename(p.imageSrc ?? "")
+      );
       let base64 = null;
 
       if (fs.existsSync(fullPath)) {
@@ -41,7 +52,7 @@ r.get("/", async (_req, res) => {
     res.json(results);
   } catch (err) {
     console.error("Error fetching partneriai:", err);
-    res.status(500).json({ error: "Failed to fetch partner photos" });
+    res.status(500).json({ error: "Nepavyko gauti partnerių duomenų" });
   }
 });
 
