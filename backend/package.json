@@ -12,7 +12,8 @@
     "migrate": "prisma migrate dev",
     "seed": "prisma db seed",
     "seed2": "ts-node dataseeds/seed2.ts",
-    "seed3": "ts-node dataseeds/seed3.ts"
+    "seed3": "ts-node dataseeds/seed3.ts",
+    "clone:lt2en": "ts-node dataseeds/seed4.ts"
   },
   "keywords": [],
   "author": "",
