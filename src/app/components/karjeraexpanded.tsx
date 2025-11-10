@@ -41,9 +41,6 @@ export default async function KarjeraExpanded({ id, lang }: Props) {
 
   return (
     <main className="max-w-3xl mx-auto px-[4vw] py-[6vh]">
-      <p className="text-xs text-red-500 mb-2">
-        lang = {lang}, isEN = {String(isEN)}
-      </p>
       {/* Title + date */}
       <div className="mb-3">
         <time className="block text-xs text-gray-500">
@@ -113,7 +110,7 @@ export default async function KarjeraExpanded({ id, lang }: Props) {
         <h2 className="text-xl font-semibold text-gray-900 mb-3">
           {isEN ? "Submit your CV" : "Pateikti CV"}
         </h2>
-        <CvForm jobId={job.id} />
+        <CvForm jobId={job.id} lang={lang}/>
       </section>
 
       {/* Optional external link */}

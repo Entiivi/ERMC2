@@ -2,7 +2,7 @@ import { Router } from "express";
 import fs from "fs";
 import path from "path";
 import { prisma } from "../prisma";
-import { Lang } from "@prisma/client"; // 👈 pridėta
+import { Lang } from "@prisma/client";
 
 const r = Router();
 
@@ -14,11 +14,9 @@ const partnerPhotoDir = path.join(
 // GET /partneriai?lang=LT arba /partneriai?lang=EN
 r.get("/", async (req, res) => {
   try {
-    // 👇 Paimame kalbą iš query (pvz. /partneriai?lang=EN)
     const queryLang = (req.query.lang as string | undefined)?.toUpperCase();
     const lang: Lang = queryLang === "EN" ? Lang.EN : Lang.LT; // numatyta LT
 
-    // 👇 Filtruojam pagal kalbą
     const partners = await prisma.partneris.findMany({
       where: { lang },
       orderBy: { name: "asc" },

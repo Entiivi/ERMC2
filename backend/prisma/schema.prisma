@@ -7,22 +7,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/**
- * ===== Multilingual support =====
- */
-
-enum Lang {
-  LT
-  EN
-}
-
-/**
- * ===== Core: Projektai + Žymos (Tags) =====
- */
-
 model Projektas {
   id        String         @id @default(cuid())
-  lang      Lang           @default(LT) // <--- PRIDĖTA
+  lang      Lang           @default(LT)
   title     String         @unique
   date      DateTime
   cover     String
@@ -30,64 +17,51 @@ model Projektas {
   tech      Json
   excerpt   String?
   link      String?
-  photos    Photo[]
-  tags      ProjektasTag[]
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
+  photos    Photo[]
+  tags      ProjektasTag[]
 }
 
 model Tag {
   id        String         @id @default(cuid())
-  lang      Lang           @default(LT) // <--- PRIDĖTA (LT/EN tag'ai atskirai)
+  lang      Lang           @default(LT)
   name      String         @unique
-  projektai ProjektasTag[]
   paraiskos CvTag[]
+  projektai ProjektasTag[]
 }
 
 model ProjektasTag {
   projektasId String
   tagId       String
-
-  projektas Projektas @relation(fields: [projektasId], references: [id], onDelete: Cascade)
-  tag       Tag       @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tag         Tag       @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  projektas   Projektas @relation(fields: [projektasId], references: [id], onDelete: Cascade)
 
   @@id([projektasId, tagId])
 }
-
-/**
- * ===== Nuotraukos (photos) =====
- */
 
 model Photo {
   id          String    @id @default(cuid())
   url         String
   caption     String?
-  projektas   Projektas @relation(fields: [projektasId], references: [id], onDelete: Cascade)
   projektasId String
+  projektas   Projektas @relation(fields: [projektasId], references: [id], onDelete: Cascade)
 
   @@index([projektasId])
 }
 
-/**
- * ===== Apie mus =====
- */
-
 model Apie {
   id        String   @id @default(cuid())
-  lang      Lang     @default(LT) // <--- PRIDĖTA
+  lang      Lang     @default(LT)
   title     String   @unique
   content   String
   order     Int
   updatedAt DateTime @updatedAt
 }
 
-/**
- * ===== Paslaugos =====
- */
-
 model Paslauga {
   id        String   @id @default(cuid())
-  lang      Lang     @default(LT) // <--- PRIDĖTA
+  lang      Lang     @default(LT)
   title     String   @unique
   subtitle  String
   iconUrl   String
@@ -96,13 +70,9 @@ model Paslauga {
   updatedAt DateTime @updatedAt
 }
 
-/**
- * ===== Partneriai =====
- */
-
 model Partneris {
   id        String   @id @default(cuid())
-  lang      Lang     @default(LT) // <--- PRIDĖTA
+  lang      Lang     @default(LT)
   name      String   @unique
   imageSrc  String
   imageAlt  String?
@@ -110,13 +80,9 @@ model Partneris {
   updatedAt DateTime @updatedAt
 }
 
-/**
- * ===== Kontaktai =====
- */
-
 model Kontaktas {
   id        String   @id @default(cuid())
-  lang      Lang     @default(LT) // <--- PRIDĖTA
+  lang      Lang     @default(LT)
   label     String   @unique
   value     String
   copyable  Boolean  @default(false)
@@ -124,10 +90,6 @@ model Kontaktas {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
-
-/**
- * ===== Karjeros paraiškos (CV / Application) =====
- */
 
 model Paraiska {
   id        String   @id @default(cuid())
@@ -137,28 +99,23 @@ model Paraiska {
   position  String
   cvUrl     String?
   message   String?
-  tags      CvTag[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  tags      CvTag[]
 }
 
 model CvTag {
   paraiskaId String
   tagId      String
-
-  paraiska Paraiska @relation(fields: [paraiskaId], references: [id], onDelete: Cascade)
-  tag      Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  paraiska   Paraiska @relation(fields: [paraiskaId], references: [id], onDelete: Cascade)
 
   @@id([paraiskaId, tagId])
 }
 
-/**
- * ===== Darbo skelbimai =====
- */
-
 model Darbas {
   id               String   @id @default(cuid())
-  lang             Lang     @default(LT) // <--- PRIDĖTA
+  lang             Lang     @default(LT)
   title            String   @unique
   location         String?
   type             String?
@@ -169,45 +126,33 @@ model Darbas {
   updatedAt        DateTime @updatedAt
 }
 
-/**
- * ===== Hero photos =====
- */
-
 model HeroPhoto {
   id        String   @id @default(cuid())
-  lang      Lang     @default(LT) // which language this photo belongs to
-  imageUrl  String // path or URL, e.g. "/photos/hero1.png"
-  alt       String? // alt text
-  order     Int      @default(0) // to control order if multiple hero slides
+  lang      Lang     @default(LT)
+  imageUrl  String
+  alt       String?
+  order     Int      @default(0)
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-/**
- * ===== Icons (generic, can be used anywhere) =====
- */
-
 model Icon {
   id        String   @id @default(cuid())
-  name      String   @unique // e.g. "engineering", "phone", "email"
-  imageUrl  String // path to icon file
-  alt       String? // accessibility label
-  category  String? // optional (e.g. "services", "contacts")
+  name      String   @unique
+  imageUrl  String
+  alt       String?
+  category  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
-
-/**
- * ===== Apie (About Us) photos =====
- */
 
 model ApiePhoto {
   id        String   @id @default(cuid())
   lang      Lang     @default(LT)
   imageUrl  String
   alt       String?
-  caption   String? // optional caption text
+  caption   String?
   order     Int      @default(0)
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -216,13 +161,17 @@ model ApiePhoto {
 
 model Service {
   id        String   @id @default(cuid())
-  lang      Lang     @default(LT) // LT arba EN (naudoja tavo turimą enum Lang)
+  lang      Lang     @default(LT)
   title     String
   subtitle  String
-  iconUrl   String // pvz. "/icons/mirp.svg"
-  details   String // ilgas tekstas / HTML / markdown
-  order     Int      @default(0) // rikiavimui
+  iconUrl   String
+  details   String
+  order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
- 
+
+enum Lang {
+  LT
+  EN
+}

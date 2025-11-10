@@ -22,17 +22,41 @@ router.get("/__ping", (_req, res) => res.send("projektai ok"));
 router.get("/", async (req, res) => {
   try {
     const queryLang = (req.query.lang as string | undefined)?.toUpperCase();
-    const lang: Lang = queryLang === "EN" ? Lang.EN : Lang.LT; // default LT
+    const lang: Lang = queryLang === "EN" ? Lang.EN : Lang.LT;
 
     const rows = await prisma.projektas.findMany({
-      where: { lang }, // 👈 filtruojam pagal kalbą
-      select: { id: true, title: true },
-      orderBy: { updatedAt: "desc" },
+      where: { lang },
+      include: {
+        tags: {
+          include: {
+            tag: true,
+          },
+        },
+      },
+      orderBy: { date: "desc" },
     });
 
-    res.json({ count: rows.length, projects: rows });
+    const projects = rows.map((p) => ({
+      id: p.id,
+      title: p.title,
+      date: p.date.toISOString(),
+      cover: p.cover,
+      tech: Array.isArray(p.tech) ? p.tech : [],
+      tags: p.tags.map((pt) => pt.tag.name),
+      excerpt: p.excerpt ?? undefined,
+      link: p.link ?? undefined,
+    }));
+
+    const allTags = Array.from(
+      new Set(projects.flatMap((p) => p.tags))
+    ).sort();
+
+    res.json({
+      projects,
+      tags: allTags,
+    });
   } catch (e) {
-    console.error("GET /projektai failed:", e);
+    console.error("GET /projects failed:", e);
     res.status(500).json({ error: "Nepavyko gauti projektų" });
   }
 });

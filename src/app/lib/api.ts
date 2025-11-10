@@ -81,6 +81,7 @@ export type KontaktasDTO = {
   icon?: string | null;
   createdAt?: string;
   updatedAt?: string;
+  lang?: "LT" | "EN";
 };
 
 export async function getJob(id: string) {

@@ -33,7 +33,7 @@ export default function PatirtisSection() {
         setErr(null);
 
         // 👇 Siunčiam kalbos parametrą į backendą
-        const res = await api<ApiResp>(`/projects?lang=${lang}`);
+        const res = await api<ApiResp>(`/projektai?lang=${lang}`);
         if (!cancelled) setData(res.projects.slice(0, 4)); // only 4
       } catch (e: any) {
         if (!cancelled)
@@ -50,7 +50,7 @@ export default function PatirtisSection() {
 
   // Kai vartotojas spaudžia ant projekto ar mygtuko „Daugiau“:
   function openMorePage() {
-    router.push(`/patirtis-placiau?lang=${lang}`); // 👈 PERDUODAM KALBĄ
+    router.push(`/patirtis-placiau?lang=${lang}`);
   }
 
   return (

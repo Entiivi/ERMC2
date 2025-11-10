@@ -14,7 +14,8 @@
     "seed2": "ts-node dataseeds/seed2.ts",
     "seed3": "ts-node dataseeds/seed3.ts",
     "clone:lt2en": "ts-node dataseeds/seed4.ts",
-    "servicesseed": "ts-node dataseeds/seed5.ts"
+    "servicesseed": "ts-node dataseeds/seed5.ts",
+    "tagsseed": "ts-node dataseeds/seed6.ts"
   },
   "keywords": [],
   "author": "",

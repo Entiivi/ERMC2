@@ -13,7 +13,7 @@ router.get("/__ping", (_req, res) => {
 router.get("/", async (req, res) => {
   try {
     const queryLang = (req.query.lang as string | undefined)?.toUpperCase();
-    const lang = queryLang === "EN" ? "EN" : "LT"; // default LT
+    const lang = queryLang === "EN" ? "EN" : "LT";
 
     console.log("=== /services CALLED ===", {
       query: req.query,
@@ -21,7 +21,7 @@ router.get("/", async (req, res) => {
     });
 
     const rows = await prisma.service.findMany({
-      where: { lang }, // filtravimas pagal kalbą
+      where: { lang },
       orderBy: { order: "asc" },
       select: {
         id: true,
@@ -29,7 +29,7 @@ router.get("/", async (req, res) => {
         subtitle: true,
         iconUrl: true,
         details: true,
-        lang: true, // 👈 kad matytume, kas grįžta
+        lang: true,
       },
     });
 

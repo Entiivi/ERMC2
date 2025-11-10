@@ -34,7 +34,7 @@ const menuItems = {
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { lang } = useLanguage(); // 👈 veikia, nes jau apgaubtas provider’iu
+  const { lang } = useLanguage();
 
   useEffect(() => {
     const header = document.querySelector('header');
@@ -106,7 +106,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="lt">
       <body className="min-h-screen flex flex-col">
-        {/* 👇 PROVIDER apgaubia visą Layout turinį */}
         <LanguageProviderClient>
           <LayoutContent>{children}</LayoutContent>
         </LanguageProviderClient>

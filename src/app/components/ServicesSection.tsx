@@ -82,17 +82,12 @@ export const ApieMusContentSprendimai = () => {
       return iconUrl;
     }
 
-    // jei DB grąžina be leading slash (pvz. "uploads/icons/vald.svg")
-    // – pridedam jį
     let normalized = iconUrl.trim();
     if (!normalized.startsWith("/")) {
       normalized = "/" + normalized;
     }
 
     return `${API}${normalized}`;
-    // pvz. API = "http://localhost:4000"
-    // normalized = "/uploads/icons/vald.svg"
-    // => "http://localhost:4000/uploads/icons/vald.svg"
   }
 
   // --- Reusable sub‐components ---

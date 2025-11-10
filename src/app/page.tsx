@@ -28,7 +28,7 @@ export default function HomePage() {
   const titles = lang === "EN"
     ? {
         apieMus: "ABOUT US",
-        services: "OUR SERVICES",
+        services: "SERVICES",
         experience: "EXPERIENCE",
         partners: "PARTNERS",
         career: "CAREER",
@@ -62,28 +62,15 @@ export default function HomePage() {
     {
       title3: titles.experience,
       content3: patirtisSection,
-      imageSrc3: "...",
-      imageAlt3: "EMRC team working",
     },
     {
       title4: titles.partners,
       content4: partneriaiSection,
-      imageSrc4: "...",
-      imageAlt4: "EMRC team working",
     },
     {
       title5: titles.career,
       content5: karjeraSection,
-      imageSrc5: "...",
-      imageAlt5: "EMRC team working",
     },
-    // Jei norėsi kontaktų kaip atskiro bloko:
-    // {
-    //   title6: lang === "EN" ? "CONTACTS" : "KONTAKTAI",
-    //   content6: kontaktaiSection,
-    //   imageSrc6: "...",
-    //   imageAlt6: "EMRC team working",
-    // },
   ];
 
   const HEADER_HEIGHT_VH = 5;

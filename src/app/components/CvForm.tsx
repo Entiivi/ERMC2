@@ -2,13 +2,18 @@
 
 import { useState } from 'react';
 
+type LangCode = "LT" | "EN";
+
 type Props = {
   jobId: string;
+  lang: LangCode;
 };
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
-export default function CvForm({ jobId }: Props) {
+export default function CvForm({ jobId, lang }: Props) {
+  const isEN = lang === "EN";
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -26,11 +31,19 @@ export default function CvForm({ jobId }: Props) {
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     ];
     if (!validTypes.includes(selected.type)) {
-      alert('Leidžiami tik PDF, DOC, DOCX failai.');
+      alert(
+        isEN
+          ? 'Only PDF, DOC, DOCX files are allowed.'
+          : 'Leidžiami tik PDF, DOC, DOCX failai.'
+      );
       return;
     }
     if (selected.size > 10 * 1024 * 1024) {
-      alert('Failas per didelis (maks. 10 MB).');
+      alert(
+        isEN
+          ? 'File is too large (max. 10 MB).'
+          : 'Failas per didelis (maks. 10 MB).'
+      );
       return;
     }
     setFile(selected);
@@ -39,7 +52,11 @@ export default function CvForm({ jobId }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file || !name || !email) {
-      alert('Užpildykite visus privalomus laukus ir pridėkite CV.');
+      alert(
+        isEN
+          ? 'Please fill in all required fields and attach your CV.'
+          : 'Užpildykite visus privalomus laukus ir pridėkite CV.'
+      );
       return;
     }
 
@@ -59,6 +76,7 @@ export default function CvForm({ jobId }: Props) {
       });
 
       if (!res.ok) throw new Error(await res.text());
+
       setStatus('success');
       setName('');
       setEmail('');
@@ -80,46 +98,54 @@ export default function CvForm({ jobId }: Props) {
     >
       {/* Name */}
       <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">Vardas, pavardė</label>
+        <label className="block text-sm font-medium mb-1">
+          {isEN ? 'Full name' : 'Vardas, pavardė'}
+        </label>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="w-full rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#14b8a6]"
-          placeholder="Vardenis Pavardenis"
+          placeholder={isEN ? 'John Doe' : 'Vardenis Pavardenis'}
           required
         />
       </div>
 
       {/* Email */}
       <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">El. paštas</label>
+        <label className="block text-sm font-medium mb-1">
+          {isEN ? 'Email' : 'El. paštas'}
+        </label>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#14b8a6]"
-          placeholder="vardenis@pastas.lt"
+          placeholder={isEN ? 'john.doe@example.com' : 'vardenis@pastas.lt'}
           required
         />
       </div>
 
-      {/* 📞 Phone */}
+      {/* Phone */}
       <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">Telefono numeris (neprivaloma)</label>
+        <label className="block text-sm font-medium mb-1">
+          {isEN ? 'Phone number (optional)' : 'Telefono numeris (neprivaloma)'}
+        </label>
         <input
           type="tel"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           className="w-full rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#14b8a6]"
-          placeholder="+370 600 12345"
+          placeholder={isEN ? '+370 600 12345' : '+370 600 12345'}
         />
       </div>
 
       {/* CV Upload */}
       <div className="mb-4">
         <label className="block text-sm font-medium mb-1">
-          CV (PDF, DOC, DOCX, maks. 10 MB)
+          {isEN
+            ? 'CV (PDF, DOC, DOCX, max. 10 MB)'
+            : 'CV (PDF, DOC, DOCX, maks. 10 MB)'}
         </label>
 
         <div className="flex items-center gap-[3vw] mt-2">
@@ -127,7 +153,7 @@ export default function CvForm({ jobId }: Props) {
             htmlFor="cv-upload"
             className="hover:scale-105 hover:text-[#14b8a6] transition duration-200 px-6 py-3 cursor-pointer select-none text-gray-800 rounded-full shadow-md hover:bg-blue-700 transition duration-300"
           >
-            Įkelti
+            {isEN ? 'Upload' : 'Įkelti'}
           </label>
 
           <input
@@ -141,19 +167,27 @@ export default function CvForm({ jobId }: Props) {
 
           {/* File name or fallback */}
           <p className="text-[1.5vh] text-gray-600 truncate max-w-[50vw]">
-            {file ? `Pasirinkta: ${file.name}` : "Nepasirinkote failo..."}
+            {file
+              ? (isEN ? `Selected: ${file.name}` : `Pasirinkta: ${file.name}`)
+              : (isEN ? 'No file selected...' : 'Nepasirinkote failo...')}
           </p>
         </div>
       </div>
 
       {/* Note */}
       <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">Žinutė (neprivaloma)</label>
+        <label className="block text-sm font-medium mb-1">
+          {isEN ? 'Message (optional)' : 'Žinutė (neprivaloma)'}
+        </label>
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
           className="w-full rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#14b8a6] min-h-[100px]"
-          placeholder="Trumpai apie save arba motyvacija..."
+          placeholder={
+            isEN
+              ? 'Briefly about yourself or your motivation...'
+              : 'Trumpai apie save arba motyvacija...'
+          }
         />
       </div>
 
@@ -166,15 +200,21 @@ export default function CvForm({ jobId }: Props) {
           aria-disabled={status === 'loading'}
           className="pt-[1vh] text-[3vh] hover:scale-105 hover:text-[#14b8a6] transition duration-200 px-6 py-3 cursor-pointer select-none text-gray-800 rounded-full shadow-md hover:bg-blue-700 transition duration-300"
         >
-          {status === 'loading' ? 'Siunčiama...' : 'Siųsti CV'}
+          {status === 'loading'
+            ? (isEN ? 'Sending...' : 'Siunčiama...')
+            : (isEN ? 'Submit CV' : 'Siųsti CV')}
         </span>
       </div>
 
       {status === 'success' && (
-        <p className="mt-2 text-green-600 text-sm">CV pateiktas sėkmingai!</p>
+        <p className="mt-2 text-green-600 text-sm">
+          {isEN ? 'CV submitted successfully!' : 'CV pateiktas sėkmingai!'}
+        </p>
       )}
       {status === 'error' && (
-        <p className="mt-2 text-red-600 text-sm">Įvyko klaida siunčiant CV.</p>
+        <p className="mt-2 text-red-600 text-sm">
+          {isEN ? 'An error occurred while submitting your CV.' : 'Įvyko klaida siunčiant CV.'}
+        </p>
       )}
     </form>
   );

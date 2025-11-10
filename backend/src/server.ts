@@ -50,6 +50,7 @@ app.use(
         immutable: true,
     })
 );
+
 // Health & ping
 app.get("/ping", (_req, res) => res.send("pong"));
 app.get("/health", (_req, res) => res.json({ ok: true }));
@@ -93,37 +94,6 @@ app.get("/about", async (_req, res) => {
     } catch (e) {
         console.error(e);
         res.status(500).json({ error: "Failed to fetch about info" });
-    }
-});
-
-// Projects (list)
-app.get("/projects", async (req, res) => {
-    try {
-        const tag = (req.query.tag as string) || "Visi";
-        const where = tag !== "Visi" ? { tags: { some: { tag: { name: tag } } } } : {};
-
-        const rows = await prisma.projektas.findMany({
-            where,
-            include: { tags: { include: { tag: true } } },
-            orderBy: { date: "desc" },
-        });
-
-        const projects = rows.map(r => ({
-            id: r.id,
-            title: r.title,
-            date: r.date.toISOString(),
-            cover: r.cover,
-            tech: Array.isArray(r.tech) ? r.tech : [],
-            tags: r.tags.map(t => t.tag.name),
-            excerpt: r.excerpt ?? undefined,
-            link: r.link ?? undefined,
-        }));
-
-        const allTags = Array.from(new Set(projects.flatMap(p => p.tags))).sort();
-        res.json({ projects, tags: allTags });
-    } catch (e) {
-        console.error(e);
-        res.status(500).json({ error: "Failed to fetch projects" });
     }
 });
 
@@ -196,23 +166,22 @@ app.get("/darbas/:id", async (req, res) => {
     }
 });
 
-//  fotos endpoint
 app.use("/projektai", projektaiRouter);
 //  paraiska endpoints
 app.use("/paraiskos", paraiskosRouter);
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 // Leisti naršyklei matyti ikonų SVG iš kito domeno
 app.use(
-  "/uploads/icons",
-  cors({ origin: "*" }), // 👈 pridėtas CORS specialiai ikonoms
-  express.static(path.join(__dirname, "../uploads/icons"), {
-    setHeaders: (res, path) => {
-      if (path.endsWith(".svg")) {
-        res.setHeader("Content-Type", "image/svg+xml");
-        res.setHeader("Access-Control-Allow-Origin", "*");
-      }
-    },
-  })
+    "/uploads/icons",
+    cors({ origin: "*" }), // 👈 pridėtas CORS specialiai ikonoms
+    express.static(path.join(__dirname, "../uploads/icons"), {
+        setHeaders: (res, path) => {
+            if (path.endsWith(".svg")) {
+                res.setHeader("Content-Type", "image/svg+xml");
+                res.setHeader("Access-Control-Allow-Origin", "*");
+            }
+        },
+    })
 );
 
 app.use("/services", servisaiTikraiservisai);

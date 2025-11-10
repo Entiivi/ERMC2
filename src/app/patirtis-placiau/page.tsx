@@ -1,11 +1,17 @@
 "use client";
 
 import PatirtisExpanded from "@/app/components/patirtisexpanded";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
+
+type LangCode = "LT" | "EN";
 
 export default function PatirtisPlaciauPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const langParam = searchParams.get("lang");
+  const lang: LangCode = langParam === "EN" ? "EN" : "LT";
 
   return (
     <main
@@ -20,11 +26,11 @@ export default function PatirtisPlaciauPage() {
           left: "12vw",
           top: "8vh",
         }}
-        aria-label="Grįžti atgal"
+        aria-label={lang === "EN" ? "Go back" : "Grįžti atgal"}
       >
         <Image
           src="/icons/back.svg"
-          alt="Atgal"
+          alt={lang === "EN" ? "Back" : "Atgal"}
           width={0}
           height={0}
           style={{
@@ -35,7 +41,6 @@ export default function PatirtisPlaciauPage() {
         />
       </a>
 
-      {/* Centered title with vw/vh padding */}
       <h1
         className="text-[3vh] font-bold text-gray-800 text-center mb-[0.4vh]"
         style={{
@@ -43,9 +48,10 @@ export default function PatirtisPlaciauPage() {
           paddingBottom: "0vh",
         }}
       >
-        Projektų galerija
+        {lang === "EN" ? "Project gallery" : "Projektų galerija"}
       </h1>
-      <PatirtisExpanded />
+
+      <PatirtisExpanded lang={lang} />
     </main>
   );
 }
