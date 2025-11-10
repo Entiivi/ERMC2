@@ -10,8 +10,8 @@ type JobDTO = {
   location?: string | null;
   type?: string | null;
   salary?: string | null;
-  postedAt: string;           // ISO string from API
-  responsibilities: string[]; // normalized in API
+  postedAt: string;
+  responsibilities: string[];
   cover?: string | null;
   link?: string | null;
 };
@@ -20,7 +20,7 @@ type LangCode = "LT" | "EN";
 
 type Props = {
   id: string;
-  lang: LangCode;   // 👈 PRIDĖTA
+  lang: LangCode;
 };
 
 export default async function KarjeraExpanded({ id, lang }: Props) {

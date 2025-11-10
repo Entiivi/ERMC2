@@ -29,7 +29,7 @@ export const KlientaiIrPartneriai: React.FC = () => {
         setLoading(true);
         setErr(null);
 
-        const resp = await fetch(`${API}/partneriai?lang=${lang}`); // 👈 KALBA QUERY'E
+        const resp = await fetch(`${API}/partneriai?lang=${lang}`);
         if (!resp.ok) throw new Error('Nepavyko gauti partnerių');
         const data = await resp.json();
 
@@ -43,7 +43,7 @@ export const KlientaiIrPartneriai: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [lang]); // 👈 kai keičiasi kalba – persikrauna partneriai
+  }, [lang]);
 
   // nustatom pradinį scroll ir „single“ plotį begaliniam takui
   useEffect(() => {

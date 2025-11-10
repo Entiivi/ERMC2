@@ -13,7 +13,7 @@ r.get("/", async (req, res) => {
     const lang: Lang = queryLang === "EN" ? Lang.EN : Lang.LT;
 
     const apie = await prisma.apie.findMany({
-      where: { lang }, // <--- filtruojame pagal kalbą
+      where: { lang },
       orderBy: { order: "asc" },
     });
 

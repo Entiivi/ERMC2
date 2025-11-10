@@ -2,11 +2,11 @@
 import { Router } from "express";
 import { prisma } from "../prisma";
 import type { JsonValue } from "@prisma/client/runtime/library";
-import { Lang } from "@prisma/client"; // <--- svarbu
+import { Lang } from "@prisma/client";
 
 type DarbasDTO = {
   id: string;
-  lang: Lang;               // pridėjome
+  lang: Lang;
   title: string;
   description?: string | null;
   location?: string | null;

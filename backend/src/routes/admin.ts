@@ -9,7 +9,7 @@ const r = Router();
 r.get("/projects", async (_req, res) => {
   try {
     const projects = await prisma.projektas.findMany({
-      orderBy: { date: "desc" }, // adjust field name
+      orderBy: { date: "desc" },
     });
     res.json(projects);
   } catch (e) {

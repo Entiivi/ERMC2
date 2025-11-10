@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { PrismaClient, Lang } from "@prisma/client"; // 👈 PRIDĖTA Lang
+import { PrismaClient, Lang } from "@prisma/client";
 import path from "node:path";
 import fs from "node:fs/promises";
 import { createReadStream } from "node:fs";
@@ -17,7 +17,6 @@ const PHOTOS_DIR = path.join(__dirname, "../uploads/photos");
 
 router.get("/__ping", (_req, res) => res.send("projektai ok"));
 
-// LIST: visi projektai (šiuo metu tik id+title) su lang filtru
 // GET /projektai?lang=LT arba /projektai?lang=EN
 router.get("/", async (req, res) => {
   try {

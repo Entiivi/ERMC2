@@ -3,10 +3,6 @@
 import React, { useRef, useEffect } from 'react'
 
 interface DottedBackgroundProps {
-    /** 
-     * If you want to override dot color, spacing, etc., you can pass a config object.
-     * Otherwise it will use the defaults below.
-     */
     dotColor?: string
     spacing?: number
     repelRadius?: number

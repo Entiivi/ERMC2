@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import type { FullProjectDTO } from "@/app/lib/api";
-import { useLanguage } from "@/app/kalbos/LanguageContext"; // 👈 PRIDĖTA
+import { useLanguage } from "@/app/kalbos/LanguageContext";
 
 type PhotoRef = {
   id: string;

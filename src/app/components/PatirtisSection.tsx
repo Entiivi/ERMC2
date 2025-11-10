@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/app/lib/api";
-import { useLanguage } from "@/app/kalbos/LanguageContext"; // 👈 PRIDĖTA
+import { useLanguage } from "@/app/kalbos/LanguageContext";
 
 type ProjectDTO = {
   id: string;
@@ -20,7 +20,7 @@ type ApiResp = { projects: ProjectDTO[]; tags: string[] };
 
 export default function PatirtisSection() {
   const router = useRouter();
-  const { lang } = useLanguage(); // 👈 AKTYVI KALBA (LT/EN)
+  const { lang } = useLanguage();
   const [data, setData] = useState<ProjectDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
@@ -32,7 +32,7 @@ export default function PatirtisSection() {
         setLoading(true);
         setErr(null);
 
-        // 👇 Siunčiam kalbos parametrą į backendą
+        // Siunčiam kalbos parametrą į backendą
         const res = await api<ApiResp>(`/projektai?lang=${lang}`);
         if (!cancelled) setData(res.projects.slice(0, 4)); // only 4
       } catch (e: any) {
@@ -46,7 +46,7 @@ export default function PatirtisSection() {
     return () => {
       cancelled = true;
     };
-  }, [lang]); // 👈 kai pasikeičia kalba, refetch'inam
+  }, [lang]); // kai pasikeičia kalba, refetch'inam
 
   // Kai vartotojas spaudžia ant projekto ar mygtuko „Daugiau“:
   function openMorePage() {

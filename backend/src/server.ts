@@ -24,14 +24,14 @@ const allowed = [
 
 const app = express();
 
-// Middleware
+// CORS
 app.use(express.json());
 app.use(
     cors({
         origin: (origin, callback) => {
             if (!origin) return callback(null, true); // allow Postman/internal calls
             if (allowed.includes(origin)) return callback(null, true);
-            console.warn(`❌ Blocked by CORS: ${origin}`);
+            console.warn(`Blocked by CORS: ${origin}`);
             return callback(new Error("CORS not allowed"));
         },
         credentials: true,
@@ -55,7 +55,6 @@ app.use(
 app.get("/ping", (_req, res) => res.send("pong"));
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
-// ===== API you had in index.ts =====
 type ProjektasWithTags = Prisma.ProjektasGetPayload<{
     include: { tags: { include: { tag: true } } }
 }>;
@@ -144,17 +143,16 @@ app.get("/darbas/:id", async (req, res) => {
         const { id } = req.params;
 
         const job = await prisma.darbas.findUnique({
-            where: { id }, // adjust if your PK is numeric: { id: Number(id) }
+            where: { id },
             select: {
                 id: true,
                 title: true,
                 description: true,
-                responsibilities: true, // string[] or text? Prisma will map appropriately
+                responsibilities: true,
                 location: true,
                 type: true,
                 salary: true,
                 postedAt: true,
-                // If you store a cover or photos in a related table, see below
             },
         });
 

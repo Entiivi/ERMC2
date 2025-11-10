@@ -15,7 +15,7 @@ const partnerPhotoDir = path.join(
 r.get("/", async (req, res) => {
   try {
     const queryLang = (req.query.lang as string | undefined)?.toUpperCase();
-    const lang: Lang = queryLang === "EN" ? Lang.EN : Lang.LT; // numatyta LT
+    const lang: Lang = queryLang === "EN" ? Lang.EN : Lang.LT;
 
     const partners = await prisma.partneris.findMany({
       where: { lang },

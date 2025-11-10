@@ -62,7 +62,7 @@ async function seedTagsAndAttachToEnProjects() {
     });
   }
 
-  console.log(`✅ Attached EN tags to ${projectsEn.length} EN projects`);
+  console.log(` Attached EN tags to ${projectsEn.length} EN projects`);
 }
 
 async function main() {

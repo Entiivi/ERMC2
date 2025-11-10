@@ -12,7 +12,7 @@ const upload = multer({
 });
 
 /**
- * PAPRASTAS CREATE iš admin panelės (JSON)
+ * 
  * POST /paraiskos
  */
 r.post("/", async (req, res) => {
@@ -45,7 +45,7 @@ r.post("/", async (req, res) => {
 });
 
 /**
- * PAPRASTAS EDIT iš admin panelės (JSON)
+ *
  * PUT /paraiskos/:id
  */
 r.put("/:id", async (req, res) => {
@@ -68,13 +68,13 @@ r.put("/:id", async (req, res) => {
     res.json(paraiska);
   } catch (err: any) {
     console.error(err);
-    // jei id nerastas ir gauni 500 – galima vėliau atskirai apdoroti P2025
+    // jei id nerastas ir gauni 500 
     res.status(500).json({ error: "Nepavyko atnaujinti paraiškos" });
   }
 });
 
 /**
- * VIEŠAS APPLY su failo upload’u – PALIKTA KAIP BUVO
+ * VIEŠAS APPLY su failo upload’u – PALIaKTA KAIP BUVO
  * POST /paraiskos/:jobId/apply
  */
 r.post("/:jobId/apply", upload.single("cv"), async (req, res) => {
@@ -101,7 +101,7 @@ r.post("/:jobId/apply", upload.single("cv"), async (req, res) => {
         name,
         email,
         phone: phone || null,
-        position: job.title, // or jobId if you want strict FK
+        position: job.title,
         cvUrl,
         message: message || null,
       },

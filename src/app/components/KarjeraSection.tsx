@@ -21,7 +21,7 @@ const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
 export default function KarjeraSection() {
   const router = useRouter();
-  const { lang } = useLanguage(); // LT / EN
+  const { lang } = useLanguage();
   const [jobs, setJobs] = useState<DarbasDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
@@ -84,12 +84,12 @@ export default function KarjeraSection() {
                 <div
                   key={job.id}
                   className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-transform duration-300 hover:scale-[1.02] cursor-pointer p-5 flex flex-col justify-between hover:border-2 hover:border-transparent hover:bg-gradient-to-br hover:from-[#14b8a6]/10 hover:to-[#0d9488]/10"
-                  onClick={() => router.push(`/karjera-placiau/${job.id}?lang=${lang}`)} // 👈 KALBA URL'E
+                  onClick={() => router.push(`/karjera-placiau/${job.id}?lang=${lang}`)}
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
-                      router.push(`/karjera-placiau/${job.id}?lang=${lang}`); // 👈 IR ČIA
+                      router.push(`/karjera-placiau/${job.id}?lang=${lang}`);
                     }
                   }}
                   aria-label={`Plačiau apie: ${job.title}`}
