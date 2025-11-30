@@ -8,9 +8,8 @@ import { ApieMusContentSprendimai } from "@/app/components/ServicesSection";
 import PatirtisSection from "@/app/components/PatirtisSection";
 import { KlientaiIrPartneriai } from "@/app/components/PartneriaiSection";
 import KarjeraSection from "@/app/components/KarjeraSection";
-import { KontaktaiSection } from "@/app/components/KontaktaiSection";
 import { ApieSection } from "@/app/components/ApieSection";
-import { useLanguage } from "@/app/kalbos/LanguageContext"; // 👈 PRIDĖTA
+import { useLanguage } from "@/app/kalbos/LanguageContext";
 
 export default function HomePage() {
   const { lang } = useLanguage(); // "LT" arba "EN"
@@ -45,7 +44,6 @@ export default function HomePage() {
   const patirtisSection = <PatirtisSection />;
   const partneriaiSection = <KlientaiIrPartneriai />;
   const karjeraSection = <KarjeraSection />;
-  const kontaktaiSection = <KontaktaiSection />;
   const apieMusContentApie = <ApieSection />;
 
   const sections = [

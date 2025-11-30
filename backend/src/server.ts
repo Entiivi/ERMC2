@@ -10,6 +10,7 @@ import paraiskosRouter from "./routes/paraiskos";
 import adminRouter from "./routes/admin";
 import partneriaiRouter from "./routes/partneriai";
 import apieRouter from "./routes/apie";
+import kontaktaiRouter from "./routes/kontaktai";
 
 // Routers (the one that has the streaming image endpoints)
 import projektaiRouter from "./routes/projektai";
@@ -167,6 +168,7 @@ app.get("/darbas/:id", async (req, res) => {
 app.use("/projektai", projektaiRouter);
 //  paraiska endpoints
 app.use("/paraiskos", paraiskosRouter);
+app.use("/kontaktai", kontaktaiRouter);
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 // Leisti naršyklei matyti ikonų SVG iš kito domeno
 app.use(

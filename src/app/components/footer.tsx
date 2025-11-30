@@ -1,24 +1,53 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
-import { getContacts, KontaktasDTO } from '@/app/lib/api';
-import { useLanguage } from '@/app/kalbos/LanguageContext';
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { useLanguage } from "@/app/kalbos/LanguageContext";
+
+type Lang = "LT" | "EN";
+
+export interface KontaktasDTO {
+  id: string;
+  lang: Lang;
+  label: string;
+  value: string;
+  copyable: boolean;
+  icon?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
 const CopyText: React.FC<{ text: string }> = ({ text }) => {
   const [hover, setHover] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(text).catch((err) => {
+      console.error("Nepavyko nukopijuoti:", err);
+    });
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLSpanElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleCopy();
+    }
+  };
+
   return (
     <span
-      onClick={() => navigator.clipboard.writeText(text)}
+      onClick={handleCopy}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      className={`ml-2 cursor-pointer text-sm select-none transition-colors ${hover ? 'text-teal-500' : 'text-gray-600'
-        }`}
+      className={`ml-2 cursor-pointer text-sm select-none transition-colors ${
+        hover ? "text-teal-500" : "text-gray-600"
+      }`}
       title="Kopijuoti"
       role="button"
       aria-label="Kopijuoti reikšmę"
       tabIndex={0}
-      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && navigator.clipboard.writeText(text)}
+      onKeyDown={handleKeyDown}
     >
       COPY
     </span>
@@ -28,11 +57,22 @@ const CopyText: React.FC<{ text: string }> = ({ text }) => {
 function inferLink(k: KontaktasDTO): string | undefined {
   const v = k.value.trim();
   const l = k.label.toLowerCase();
-  if (v.includes('@') && !v.startsWith('http')) return `mailto:${v}`;
-  const digits = v.replace(/[^\d+]/g, '');
-  if ((digits.startsWith('+') || /\d/.test(digits)) && (l.includes('telefon') || l.includes('tel')))
+
+  // el. paštas
+  if (v.includes("@") && !v.startsWith("http")) return `mailto:${v}`;
+
+  // telefonas
+  const digits = v.replace(/[^\d+]/g, "");
+  if (
+    (digits.startsWith("+") || /\d/.test(digits)) &&
+    (l.includes("telefon") || l.includes("tel"))
+  ) {
     return `tel:${digits}`;
+  }
+
+  // pilnas URL
   if (/^https?:\/\//i.test(v)) return v;
+
   return undefined;
 }
 
@@ -44,22 +84,43 @@ export default function Footer() {
 
   useEffect(() => {
     let cancelled = false;
+
     (async () => {
       try {
         setLoading(true);
-        const resp = await getContacts();
-        const data: KontaktasDTO[] = Array.isArray(resp) ? resp : resp.contacts ?? [];
-        if (!cancelled) setContacts(data);
+        setErr(null);
+
+        // kviečiam TAVO backend route
+        const res = await fetch(`${API}/kontaktai?lang=${lang}`);
+        if (!res.ok) {
+          throw new Error(`Serverio klaida: ${res.status}`);
+        }
+
+        const data = (await res.json()) as KontaktasDTO[];
+
+        if (!cancelled) {
+          setContacts(Array.isArray(data) ? data : []);
+        }
       } catch (e) {
-        if (!cancelled) setErr(e instanceof Error ? e.message : 'Nepavyko įkelti kontaktų');
+        if (!cancelled) {
+          const msg =
+            e instanceof Error ? e.message : "Nepavyko įkelti kontaktų";
+          setErr(msg);
+        }
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     })();
-    return () => { cancelled = true; };
-  }, []);
 
-  const visibleContacts = contacts.filter((c) => c.lang === lang);
+    return () => {
+      cancelled = true;
+    };
+  }, [lang]);
+
+  // jei nori papildomai filtruoti, gali, bet /kontaktai?lang= jau grąžina pagal kalbą
+  const visibleContacts = contacts; // .filter((c) => c.lang === lang);
 
   return (
     <footer
@@ -72,6 +133,7 @@ export default function Footer() {
       }}
     >
       <div className="max-w-7xl mx-auto px-[4vw] py-8 grid grid-cols-2 gap-[0.5vw]">
+        {/* Logo blokas */}
         <div className="flex items-center justify-center bg-white rounded-xl shadow-sm p-6 min-h-[220px]">
           <div className="relative w-[10vw] h-[10vh]">
             <Image
@@ -84,12 +146,13 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Kontaktų blokas */}
         <div className="bg-white rounded-xl shadow-sm p-6 min-h-[220px] pt-[1vh]">
           {loading && <p className="text-sm text-gray-500">Kraunama…</p>}
           {err && <p className="text-sm text-red-600">{err}</p>}
 
           {!loading && !err && (
-            <div className="space-y-2 py-[1.5vh]">
+            <div className="space-y-2 py-[1.5vh] pt-[6vh]">
               {visibleContacts.map((item) => {
                 const link = inferLink(item);
                 return (
@@ -116,7 +179,18 @@ export default function Footer() {
                     <div>
                       <div className="flex gap-[1vw] text-sm text-left">
                         {link ? (
-                          <a>{item.value}</a>
+                          <a
+                            href={link}
+                            target={link.startsWith("http") ? "_blank" : undefined}
+                            rel={
+                              link.startsWith("http")
+                                ? "noopener noreferrer"
+                                : undefined
+                            }
+                            className="hover:underline"
+                          >
+                            {item.value}
+                          </a>
                         ) : (
                           <span>{item.value}</span>
                         )}

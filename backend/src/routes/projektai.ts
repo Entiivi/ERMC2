@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { PrismaClient, Lang } from "@prisma/client";
+import { PrismaClient, Lang, Prisma } from "@prisma/client";
 import path from "node:path";
 import fs from "node:fs/promises";
 import { createReadStream } from "node:fs";
@@ -40,10 +40,12 @@ router.get("/", async (req, res) => {
       title: p.title,
       date: p.date.toISOString(),
       cover: p.cover,
+      logoUrl: p.logoUrl ?? undefined,
       tech: Array.isArray(p.tech) ? p.tech : [],
       tags: p.tags.map((pt) => pt.tag.name),
       excerpt: p.excerpt ?? undefined,
       link: p.link ?? undefined,
+      client: (p as any).client ?? undefined, // jeigu pridėjai client lauką
     }));
 
     const allTags = Array.from(
@@ -55,10 +57,264 @@ router.get("/", async (req, res) => {
       tags: allTags,
     });
   } catch (e) {
-    console.error("GET /projects failed:", e);
+    console.error("GET /projektai failed:", e);
     res.status(500).json({ error: "Nepavyko gauti projektų" });
   }
 });
+
+// CREATE projektą – POST /projektai
+router.post("/", async (req, res) => {
+  try {
+    const {
+      title,
+      date,
+      cover,
+      logoUrl,
+      tech,
+      excerpt,
+      link,
+      client,
+      lang,
+      tags,
+    }: {
+      title: string;
+      date?: string;          // ISO arba YYYY-MM-DD
+      cover: string;
+      logoUrl?: string;
+      tech?: any;
+      excerpt?: string;
+      link?: string;
+      client?: string;
+      lang?: string;
+      tags?: string[];        // pasirenkama: tagų pavadinimai
+    } = req.body;
+
+    if (!title || !title.trim()) {
+      return res.status(400).json({ error: "Trūksta 'title'" });
+    }
+    if (!cover || !cover.trim()) {
+      return res.status(400).json({ error: "Trūksta 'cover' kelio" });
+    }
+
+    const normalizedLang: Lang =
+      lang?.toUpperCase() === "EN" ? Lang.EN : Lang.LT;
+
+    const parsedDate = date ? new Date(date) : new Date();
+    if (Number.isNaN(parsedDate.getTime())) {
+      return res.status(400).json({ error: "Neteisinga data" });
+    }
+
+    // tech kaip JSON masyvas
+    const techJson =
+      Array.isArray(tech) || typeof tech === "object" ? tech : [];
+
+    // Bazinis projektas
+    const data: Prisma.ProjektasCreateInput = {
+      title: title.trim(),
+      date: parsedDate,
+      cover: cover.trim(),
+      logoUrl: logoUrl?.trim() || null,
+      tech: techJson,
+      excerpt: excerpt?.trim() || null,
+      link: link?.trim() || null,
+      lang: normalizedLang,
+      // jei pridėjai client lauką:
+      ...(client ? { client: client.trim() } : {}),
+    };
+
+    // Jei nori iš karto tvarkyti TAG'us:
+    if (Array.isArray(tags) && tags.length > 0) {
+      (data as any).tags = {
+        create: tags.map((name) => ({
+          tag: {
+            connectOrCreate: {
+              where: { name },
+              create: { name },
+            },
+          },
+        })),
+      };
+    }
+
+    const created = await prisma.projektas.create({
+      data,
+      include: {
+        tags: { include: { tag: true } },
+      },
+    });
+
+    res.status(201).json({
+      id: created.id,
+      title: created.title,
+      date: created.date.toISOString(),
+      cover: created.cover,
+      logoUrl: created.logoUrl ?? undefined,
+      tech: Array.isArray(created.tech) ? created.tech : [],
+      tags: created.tags.map((pt) => pt.tag.name),
+      excerpt: created.excerpt ?? undefined,
+      link: created.link ?? undefined,
+      client: (created as any).client ?? undefined,
+    });
+  } catch (e: any) {
+    console.error("POST /projektai failed:", e);
+    if (e?.code === "P2002") {
+      return res
+        .status(409)
+        .json({ error: "Projektas su tokiu pavadinimu jau egzistuoja" });
+    }
+    res.status(500).json({ error: "Nepavyko sukurti projekto" });
+  }
+});
+
+// UPDATE projektą – PUT /projektai/:id
+router.put("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const {
+      title,
+      date,
+      cover,
+      logoUrl,
+      tech,
+      excerpt,
+      link,
+      client,
+      lang,
+      tags,
+    }: {
+      title?: string;
+      date?: string;
+      cover?: string;
+      logoUrl?: string;
+      tech?: any;
+      excerpt?: string;
+      link?: string;
+      client?: string;
+      lang?: string;
+      tags?: string[];
+    } = req.body;
+
+    const data: Prisma.ProjektasUpdateInput = {};
+
+    if (title !== undefined) data.title = title.trim();
+    if (cover !== undefined) data.cover = cover.trim();
+    if (logoUrl !== undefined) data.logoUrl = logoUrl.trim() || null;
+    if (excerpt !== undefined) data.excerpt = excerpt.trim() || null;
+    if (link !== undefined) data.link = link.trim() || null;
+    if (client !== undefined) (data as any).client = client.trim();
+    if (lang !== undefined) {
+      data.lang = lang.toUpperCase() === "EN" ? Lang.EN : Lang.LT;
+    }
+    if (date !== undefined) {
+      const d = new Date(date);
+      if (Number.isNaN(d.getTime())) {
+        return res.status(400).json({ error: "Neteisinga data" });
+      }
+      data.date = d;
+    }
+    if (tech !== undefined) {
+      data.tech =
+        Array.isArray(tech) || typeof tech === "object" ? tech : [];
+    }
+
+    // Tagų atnaujinimas (paprastas variantas: ištrinam visus ir sukuriam iš naujo)
+    if (tags !== undefined) {
+      (data as any).tags = {
+        deleteMany: {}, // išvalom senus ryšius
+        create: Array.isArray(tags)
+          ? tags.map((name) => ({
+              tag: {
+                connectOrCreate: {
+                  where: { name },
+                  create: { name },
+                },
+              },
+            }))
+          : [],
+      };
+    }
+
+    const updated = await prisma.projektas.update({
+      where: { id },
+      data,
+      include: {
+        tags: { include: { tag: true } },
+      },
+    });
+
+    res.json({
+      id: updated.id,
+      title: updated.title,
+      date: updated.date.toISOString(),
+      cover: updated.cover,
+      logoUrl: updated.logoUrl ?? undefined,
+      tech: Array.isArray(updated.tech) ? updated.tech : [],
+      tags: updated.tags.map((pt) => pt.tag.name),
+      excerpt: updated.excerpt ?? undefined,
+      link: updated.link ?? undefined,
+      client: (updated as any).client ?? undefined,
+    });
+  } catch (e: any) {
+    console.error("PUT /projektai/:id failed:", e);
+    if (e?.code === "P2002") {
+      return res
+        .status(409)
+        .json({ error: "Projektas su tokiu pavadinimu jau egzistuoja" });
+    }
+    res.status(500).json({ error: "Nepavyko atnaujinti projekto" });
+  }
+});
+
+// GET vieną projektą – GET /projektai/:id
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const p = await prisma.projektas.findUnique({
+      where: { id },
+      include: {
+        tags: { include: { tag: true } },
+      },
+    });
+
+    if (!p) return res.status(404).json({ error: "Projektas nerastas" });
+
+    res.json({
+      id: p.id,
+      title: p.title,
+      date: p.date.toISOString(),
+      cover: p.cover,
+      logoUrl: p.logoUrl ?? undefined,
+      tech: Array.isArray(p.tech) ? p.tech : [],
+      tags: p.tags.map((pt) => pt.tag.name),
+      excerpt: p.excerpt ?? undefined,
+      link: p.link ?? undefined,
+      client: (p as any).client ?? undefined,
+    });
+  } catch (e) {
+    console.error("GET /projektai/:id failed:", e);
+    res.status(500).json({ error: "Nepavyko gauti projekto" });
+  }
+});
+
+// DELETE projektą – DELETE /projektai/:id
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await prisma.projektas.delete({
+      where: { id },
+    });
+
+    res.json({ ok: true });
+  } catch (e) {
+    console.error("DELETE /projektai/:id failed:", e);
+    res.status(500).json({ error: "Nepavyko ištrinti projekto" });
+  }
+});
+
+// ======= NUOTRAUKŲ DALIS LIEKA TOKIA PAT =======
 
 function safeJoinPhotos(relativeOrRooted: string) {
   const rel = relativeOrRooted.replace(/^\/+/, "");
@@ -96,7 +352,7 @@ router.get("/:id/fotos", async (req, res) => {
     const base = baseUrl(req);
     const uploadsDir = path.join(__dirname, "../../uploads/photos");
 
-    const verifiedPhotos = [];
+    const verifiedPhotos: any[] = [];
     for (const p of photos) {
       const dbPath = (p.url || "").trim();
       const filename = path.basename(dbPath);
@@ -137,7 +393,7 @@ router.get("/debug/with-photos", async (req, res) => {
       queryLang === "EN" ? Lang.EN : queryLang === "LT" ? Lang.LT : undefined;
 
     const rows = await prisma.projektas.findMany({
-      where: lang ? { lang } : undefined, // jei ?lang nėra, rodom viską
+      where: lang ? { lang } : undefined,
       select: {
         id: true,
         title: true,
