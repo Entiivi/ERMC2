@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, FormEvent } from "react";
+import { PartneriaiPreviewPanel } from "../admin/prerview/PartneriaiPreviewPanel"
 
 type Lang = "LT" | "EN";
 
@@ -331,6 +332,7 @@ export function PartnersPanel({ apiBase }: PartnersPanelProps) {
           </div>
         </form>
       </section>
+      <PartneriaiPreviewPanel lang={lang} />
     </div>
   );
 }

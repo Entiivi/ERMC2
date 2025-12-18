@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ProjectsPanel } from "../components/admin/ProjectsPanel";
+import { ProjectsPanel } from "../components/admin/projects/ProjectsPanel";
 import { ParaiskosPanel } from "../components/admin/ParaiskosPanel";
 import { ServicesPanel } from "../components/admin/ServicesPanel";
 import { PartnersPanel } from "../components/admin/PartnersPanel";

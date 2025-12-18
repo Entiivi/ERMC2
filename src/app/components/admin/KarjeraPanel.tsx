@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, FormEvent } from "react";
+import { KarjeraPreviewPanel } from "../admin/prerview/KarjeraPreviewPanel"
 
 type Lang = "LT" | "EN";
 
@@ -468,6 +469,8 @@ export function CareersPanel({ apiBase }: CareersPanelProps) {
           </div>
         </form>
       </section>
+      <KarjeraPreviewPanel lang={lang} />
     </div>
+    
   );
 }

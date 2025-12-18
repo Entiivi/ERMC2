@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, FormEvent } from "react";
+import { ServicesPreviewPanel } from "../admin/prerview/ServicesPreviewPanel"
 
 type Lang = "LT" | "EN";
 
@@ -358,6 +359,7 @@ export function ServicesPanel({ apiBase }: ServicesPanelProps) {
           </div>
         </form>
       </section>
+      <ServicesPreviewPanel lang={lang} />
     </div>
   );
 }

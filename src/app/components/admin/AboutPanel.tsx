@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, FormEvent } from "react";
-
+import { ApiePreviewPanel } from "../admin/prerview/ApiePreviewPanel"
 type Lang = "LT" | "EN";
 
 type AboutItem = {
@@ -329,6 +329,7 @@ export function AboutPanel({ apiBase }: AboutPanelProps) {
           </div>
         </form>
       </section>
+      <ApiePreviewPanel lang={lang} />
     </div>
   );
 }

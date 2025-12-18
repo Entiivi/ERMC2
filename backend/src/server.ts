@@ -11,6 +11,27 @@ import adminRouter from "./routes/admin";
 import partneriaiRouter from "./routes/partneriai";
 import apieRouter from "./routes/apie";
 import kontaktaiRouter from "./routes/kontaktai";
+import workersRouter from "./routes/workers";
+import electricityProvidersRouter from "./routes/projectRoutes/electricityProvider";
+import projectWorkersRouter from "./routes/projectRoutes/projectWorkers";
+import projectProvidersRouter from "./routes/projectRoutes/projectProviders";
+import externalGeo from "./routes/external/externalGeo";
+import externalElectricity from "./routes/external/externalElectricity";
+import ltMaterialsRouter from "./routes/external/ltMaterials";
+import projectMaterialsRouter from "./routes/projectRoutes/projectMaterials";
+import ltIndexAdmin from "./routes/external/ltIndexAdmin";
+import ltIndexPublic from "./routes/external/ltIndexPublic";
+import ltPriceSeries from "./routes/external/ltPriceSeries";
+import projectLocationRouter from "./routes/projectRoutes/projectLocation";
+import geoRouter from "./routes/external/externalGeo";
+import rcParcels from "./routes/external/rcParcels";
+import projectRcRouter from "./routes/projectRoutes/projectRc";
+import electricityAdminRouter from "./routes/projectRoutes/electricityProvider";
+import electricityPublicRouter from "./routes/electricityPublic";
+import projectElectricityRouter from "./routes/projectRoutes/projectProviders";
+
+
+import cron from "node-cron";
 
 // Routers (the one that has the streaming image endpoints)
 import projektaiRouter from "./routes/projektai";
@@ -51,6 +72,7 @@ app.use(
         immutable: true,
     })
 );
+
 
 // Health & ping
 app.get("/ping", (_req, res) => res.send("pong"));
@@ -171,9 +193,13 @@ app.use("/paraiskos", paraiskosRouter);
 app.use("/kontaktai", kontaktaiRouter);
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 // Leisti naršyklei matyti ikonų SVG iš kito domeno
+app.use("/admin/workers", workersRouter);
+app.use("/admin/electricity-providers", electricityProvidersRouter);
+app.use("/admin/projects", projectWorkersRouter);
+app.use("/admin/projects", projectProvidersRouter);
 app.use(
     "/uploads/icons",
-    cors({ origin: "*" }), // 👈 pridėtas CORS specialiai ikonoms
+    cors({ origin: "*" }),
     express.static(path.join(__dirname, "../uploads/icons"), {
         setHeaders: (res, path) => {
             if (path.endsWith(".svg")) {
@@ -184,10 +210,38 @@ app.use(
     })
 );
 
+
 app.use("/services", servisaiTikraiservisai);
 
 //  admin endpoints
 app.use("/admin", adminRouter);
+app.use("/external", ltIndexAdmin);
+
+app.use("/external", ltMaterialsRouter);
+app.use("/external", ltIndexPublic);
+app.use("/external", ltPriceSeries);
+
+app.use("/external/geo", externalGeo);
+app.use("/external/electricity", externalElectricity);
+
+app.use("/projects", projectMaterialsRouter);
+
+app.use("/projects", projectLocationRouter);
+
+app.use("/geo", geoRouter);
+
+app.use("/rc", rcParcels);
+
+app.use("/projects", projectRcRouter);
+
+app.use("/admin/electricity-providers", electricityAdminRouter);
+app.use("/electricity", electricityPublicRouter);
+app.use("/projects", projectElectricityRouter);
+
+
+app.use("/workers", workersRouter);
+
+app.use("/projects", projectWorkersRouter);
 
 // Diagnostics (show DB path on startup import)
 console.log("DATABASE_URL =", process.env.DATABASE_URL);

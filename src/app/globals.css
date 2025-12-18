@@ -47,11 +47,12 @@
     scrollbar-width: none;
 }
 
-.no-child-scroll, .no-child-scroll * {
-  overflow: visible !important;
+.no-child-scroll,
+.no-child-scroll * {
+    overflow: visible !important;
 }
 
+@import "leaflet/dist/leaflet.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-

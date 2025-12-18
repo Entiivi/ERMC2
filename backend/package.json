@@ -15,7 +15,10 @@
     "seed3": "ts-node dataseeds/seed3.ts",
     "clone:lt2en": "ts-node dataseeds/seed4.ts",
     "servicesseed": "ts-node dataseeds/seed5.ts",
-    "tagsseed": "ts-node dataseeds/seed6.ts"
+    "tagsseed": "ts-node dataseeds/seed6.ts",
+    "elektrseed":"ts-node dataseeds/seedElektr.ts",
+    "seedWorkers":"ts-node dataseeds/seedWorkers.ts"
+    
   },
   "keywords": [],
   "author": "",
@@ -27,7 +30,10 @@
     "express": "^5.1.0",
     "mime-types": "^3.0.1",
     "multer": "^2.0.2",
-    "undici": "^7.16.0"
+    "node-cron": "^4.2.1",
+    "proj4": "^2.20.2",
+    "undici": "^7.16.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",

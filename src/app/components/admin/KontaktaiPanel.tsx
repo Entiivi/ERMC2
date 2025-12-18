@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, FormEvent } from "react";
+import { FooterPreviewPanel } from "../admin/prerview/FooterPreviewPanel"
 
 type Lang = "LT" | "EN";
 
@@ -394,6 +395,7 @@ export function ContactsPanel({ apiBase }: ContactsPanelProps) {
           </div>
         </form>
       </section>
+      <FooterPreviewPanel lang={lang} />
     </div>
   );
 }

@@ -149,7 +149,7 @@ export default function Footer() {
         {/* Kontaktų blokas */}
         <div className="bg-white rounded-xl shadow-sm p-6 min-h-[220px] pt-[1vh]">
           {loading && <p className="text-sm text-gray-500">Kraunama…</p>}
-          {err && <p className="text-sm text-red-600">{err}</p>}
+          {err && <p className="text-sm">{err}</p>}
 
           {!loading && !err && (
             <div className="space-y-2 py-[1.5vh] pt-[6vh]">
