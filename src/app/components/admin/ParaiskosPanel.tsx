@@ -157,7 +157,7 @@ export function ParaiskosPanel({ apiBase }: Props) {
   return (
     <>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">CV paraiškos</h2>
+        <h2 className="text-xl font-semibold">Paraiškos</h2>
         <button
           onClick={startCreateParaiska}
           className="text-sm px-3 py-1 rounded-md border border-teal-600 text-teal-700 hover:bg-teal-50"

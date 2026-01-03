@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useEffect, useState, FormEvent } from "react";
+import { useEffect, useState, FormEvent, useRef } from "react";
 import { Lang, Project } from "./type";
 import { ProjectsHeader } from "./ProjectsHeader";
 import { ProjectsTable } from "./ProjectsTable";
@@ -244,8 +244,22 @@ export function ProjectsPanel({ apiBase }: ProjectsPanelProps) {
       );
     });
 
+
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const previewRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!previewOpen) return;
+
+    const t = window.setTimeout(() => {
+      previewRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    }, 320);
+
+    return () => window.clearTimeout(t);
+  }, [previewOpen]);
+
   return (
-    <div className="space-y-6">
+    <div className="overflow-x-hidden">
       <ProjectsHeader
         lang={lang}
         onLangChange={setLang}
@@ -271,15 +285,36 @@ export function ProjectsPanel({ apiBase }: ProjectsPanelProps) {
       />
 
       {/* Mygtukas naujam projektui */}
-      <div className="pt-2">
-        <button
+      <div className="pt-2 flex items-center gap-[1vw]">
+        <a
           type="button"
           onClick={handleCreateClick}
-          className="px-4 py-1.5 rounded-full bg-black/80 hover:bg-black text-sm"
+          className="hover:scale-105 hover:text-[#14b8a6] transition-transform duration-200 px-6 py-3 cursor-pointer select-none"
         >
           Pridėti naują projektą
-        </button>
+        </a>
+
+        <a
+          type="button"
+          onClick={() => setPreviewOpen((v) => !v)}
+          className="p-2 rounded-full hover:bg-black/10 transition"
+          aria-label="Toggle projektų peržiūra"
+        >
+          <div className="hover:scale-105 hover:text-[#14b8a6] transition-transform duration-200 pt-2 flex items-center gap-2 cursor-pointer select-none">
+            <span>
+              Peržiūra
+            </span>
+            <span
+              className={`block scale-150 transition-transform duration-200 ${previewOpen ? "rotate-180" : ""
+                }`}
+            >
+              ▾
+            </span>
+          </div>
+
+        </a>
       </div>
+
 
       {/* Fullscreen modal su pilna info + forma */}
       <ProjectEditModal
@@ -309,8 +344,21 @@ export function ProjectsPanel({ apiBase }: ProjectsPanelProps) {
         onSubmit={handleSubmit}
         onCancelEdit={closeModal}
       />
-      <ProjektaiPreviewPanel lang={lang} />
+      <div ref={previewRef}
+        className="scroll-mt-[100vh]"
+      >
+        <div
+          className={[
+            "grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out",
+            previewOpen ? "grid-rows-[1fr] opacity-100 mt-4" : "grid-rows-[0fr] opacity-0 mt-0",
+          ].join(" ")}
+        >
+          <div className="min-h-0 overflow-hidden">
+            <ProjektaiPreviewPanel lang={lang} />
+          </div>
+        </div>
+      </div>
     </div>
-    
+
   );
 }

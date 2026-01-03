@@ -111,13 +111,18 @@ model ProjektasWorker {
 
 model ProjektasMaterial {
   projektasId  String
-  materialKey  String   // pvz. "cement_cem2_42_5r"
-  quantity     Float    @default(1)
+  materialKey  String
+  quantity     Float   @default(1)
+
+  unitPrice    Decimal? 
+  vatRate      Decimal?
+  currency     String?
 
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   projektas    Projektas @relation(fields: [projektasId], references: [id], onDelete: Cascade)
+  material     Material  @relation(fields: [materialKey], references: [key], onDelete: Restrict)
 
   @@id([projektasId, materialKey])
   @@index([materialKey])
@@ -138,6 +143,49 @@ model ProjektasTag {
   projektas   Projektas @relation(fields: [projektasId], references: [id], onDelete: Cascade)
 
   @@id([projektasId, tagId])
+}
+
+model Material {
+  key         String   @id
+  name        String
+  unit        String
+  description String?
+
+  category    String?
+  brand       String?
+  sku         String?  @unique
+  isActive    Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  projektai   ProjektasMaterial[]
+  prices      MaterialPrice[]
+
+  @@index([name])
+  @@index([category])
+  @@index([isActive])
+}
+
+model MaterialPrice {
+  id          String   @id @default(cuid())
+  materialKey String
+
+  supplier    String?
+  price       Decimal 
+  currency    String   @default("EUR")
+  vatRate     Decimal?
+
+  validFrom   DateTime @default(now())
+  validTo     DateTime?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  material    Material @relation(fields: [materialKey], references: [key], onDelete: Cascade)
+
+  @@index([materialKey, validFrom])
+  @@index([materialKey, validTo])
 }
 
 model Photo {

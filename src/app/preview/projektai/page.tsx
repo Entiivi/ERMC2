@@ -16,7 +16,7 @@ export default function PartneriaiPreviewPage() {
 
   return (
     <LanguageProvider>
-      <main className="min-h-screen bg-neutral-50 p-6">
+      <main className="min-h-screen bg-transparent p-6 overflow-x-hidden">
         <PatirtisPlaciauPage lang={lang}/>
       </main>
     </LanguageProvider>

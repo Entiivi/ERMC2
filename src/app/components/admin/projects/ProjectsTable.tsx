@@ -105,7 +105,7 @@ export function ProjectsTable({
                     <span className="opacity-60 text-xs">–</span>
                   )}
                 </td>
-                <td className="px-3 py-2 border-b border-white/20 align-top">
+                <td className="px-3 py-2 border-white/20 align-top">
                   <div className="flex flex-wrap gap-2">
                     <button
                       type="button"

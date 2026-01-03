@@ -29,7 +29,7 @@ export function FooterPreviewPanel({
         </a>
       </div>
 
-      <div className="h-[520px] rounded-xl overflow-hidden bg-white border">
+      <div className="h-[520px] rounded-xl overflow-hidden bg-white">
         <iframe
           src={src}
           className="w-full h-full"

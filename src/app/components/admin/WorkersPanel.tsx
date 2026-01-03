@@ -1,78 +1,75 @@
 "use client";
 
 import { useEffect, useState, FormEvent } from "react";
-import { PartneriaiPreviewPanel } from "../admin/prerview/PartneriaiPreviewPanel"
 
-type Lang = "LT" | "EN";
-
-export type Partner = {
+export type WorkerDTO = {
   id: string;
-  name: string;
-  image: string | null;      // base64 iš backend
-  imageSrc: string | null;   // failo kelias
-  alt: string | null;
-  lang: Lang;
+  fullName: string;
+  email?: string | null;
+  phone?: string | null;
+  role?: string | null;
 };
 
-type PartnersPanelProps = {
-  apiBase: string;
+type WorkersPanelProps = {
+  apiBase: string; // e.g. process.env.NEXT_PUBLIC_API_URL
 };
 
-export function PartnersPanel({ apiBase }: PartnersPanelProps) {
-  const [lang, setLang] = useState<Lang>("LT");
-  const [partners, setPartners] = useState<Partner[]>([]);
+export function WorkersPanel({ apiBase }: WorkersPanelProps) {
+  const [workers, setWorkers] = useState<WorkerDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // form state
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [name, setName] = useState("");
-  const [imageSrc, setImageSrc] = useState("");
-  const [alt, setAlt] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [role, setRole] = useState("");
 
   const resetForm = () => {
     setEditingId(null);
-    setName("");
-    setImageSrc("");
-    setAlt("");
+    setFullName("");
+    setEmail("");
+    setPhone("");
+    setRole("");
   };
 
-  const fetchPartners = async (currentLang: Lang) => {
+  const fetchWorkers = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const res = await fetch(`${apiBase}/partneriai?lang=${currentLang}`);
-      if (!res.ok) {
-        throw new Error(`Serverio klaida: ${res.status}`);
-      }
+      const res = await fetch(`${apiBase}/workers`, { cache: "no-store" });
+      if (!res.ok) throw new Error(`Serverio klaida: ${res.status}`);
 
-      const data = (await res.json()) as Partner[];
-      setPartners(data);
+      const data = (await res.json()) as WorkerDTO[];
+      setWorkers(data);
     } catch (err: any) {
-      console.error("Nepavyko gauti partnerių:", err);
-      setError(err?.message ?? "Nepavyko gauti partnerių");
+      console.error("Nepavyko gauti darbuotojų:", err);
+      setError(err?.message ?? "Nepavyko gauti darbuotojų");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchPartners(lang);
-  }, [lang]);
+    fetchWorkers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (!name.trim()) {
-      alert("Pavadinimas (name) privalomas");
+    if (!fullName.trim()) {
+      alert("Vardas ir pavardė (fullName) privaloma");
       return;
     }
 
     const payload = {
-      name: name.trim(),
-      imageSrc: imageSrc.trim() || null,
-      imageAlt: alt.trim() || null,
-      lang,
+      fullName: fullName.trim(),
+      email: email.trim() || null,
+      phone: phone.trim() || null,
+      role: role.trim() || null,
     };
 
     try {
@@ -80,66 +77,71 @@ export function PartnersPanel({ apiBase }: PartnersPanelProps) {
 
       if (editingId == null) {
         // CREATE
-        const res = await fetch(`${apiBase}/partneriai`, {
+        const res = await fetch(`${apiBase}/workers`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
+
         if (!res.ok) {
           const body = await res.json().catch(() => ({}));
           throw new Error(
-            body.error || `Nepavyko sukurti partnerio (status ${res.status})`
+            body.error || `Nepavyko sukurti darbuotojo (status ${res.status})`
           );
         }
       } else {
         // UPDATE
-        const res = await fetch(`${apiBase}/partneriai/${editingId}`, {
+        const res = await fetch(`${apiBase}/workers/${editingId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
+
         if (!res.ok) {
           const body = await res.json().catch(() => ({}));
           throw new Error(
-            body.error || `Nepavyko atnaujinti partnerio (status ${res.status})`
+            body.error || `Nepavyko atnaujinti darbuotojo (status ${res.status})`
           );
         }
       }
 
       resetForm();
-      await fetchPartners(lang);
+      await fetchWorkers();
     } catch (err: any) {
       console.error("Save error:", err);
-      setError(err?.message ?? "Nepavyko išsaugoti partnerio");
+      setError(err?.message ?? "Nepavyko išsaugoti darbuotojo");
     }
   };
 
-  const handleEditClick = (partner: Partner) => {
-    setEditingId(partner.id);
-    setName(partner.name ?? "");
-    setImageSrc(partner.imageSrc ?? "");
-    setAlt(partner.alt ?? "");
+  const handleEditClick = (w: WorkerDTO) => {
+    setEditingId(w.id);
+    setFullName(w.fullName ?? "");
+    setEmail(w.email ?? "");
+    setPhone(w.phone ?? "");
+    setRole(w.role ?? "");
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Ar tikrai ištrinti šį partnerį?")) return;
+    if (!confirm("Ar tikrai ištrinti šį darbuotoją?")) return;
 
     try {
       setError(null);
-      const res = await fetch(`${apiBase}/partneriai/${id}`, {
-        method: "DELETE",
-      });
+
+      const res = await fetch(`${apiBase}/workers/${id}`, { method: "DELETE" });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         throw new Error(
-          body.error || `Nepavyko ištrinti partnerio (status ${res.status})`
+          body.error || `Nepavyko ištrinti darbuotojo (status ${res.status})`
         );
       }
 
-      await fetchPartners(lang);
+      // if you were editing this worker, reset
+      if (editingId === id) resetForm();
+
+      await fetchWorkers();
     } catch (err: any) {
       console.error("Delete error:", err);
-      setError(err?.message ?? "Nepavyko ištrinti partnerio");
+      setError(err?.message ?? "Nepavyko ištrinti darbuotojo");
     }
   };
 
@@ -148,58 +150,32 @@ export function PartnersPanel({ apiBase }: PartnersPanelProps) {
       {/* HEADER */}
       <header className="flex items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold mb-1">
-            Partneriai
-          </h2>
-        </div>
-
-        {/* kalbos pasirinkimas */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm">Kalba:</span>
-          <select
-            value={lang}
-            onChange={(e) => {
-              const newLang = e.target.value === "EN" ? "EN" : "LT";
-              setLang(newLang);
-              resetForm();
-            }}
-            className="text-black text-sm rounded-md px-2 py-1 border border-black"
-          >
-            <option value="LT">LT</option>
-            <option value="EN">EN</option>
-          </select>
+          <h2 className="text-2xl font-semibold mb-1">Darbuotojai</h2>
         </div>
       </header>
 
-      {/* ERROR / LOADING */}
+      {/* ERROR */}
       {error && (
         <div className="border border-red-500 bg-red-700/60 text-white text-sm rounded-xl px-3 py-2">
           Klaida: {error}
         </div>
       )}
 
-      {/* LENTELĖ */}
+      {/* TABLE */}
       <div className="border border-white/70 rounded-2xl overflow-hidden bg-[#22c55e]/40">
         <table className="w-full text-sm">
           <thead className="bg-black/20">
             <tr className="text-left">
-              <th className="px-3 py-2 border-b border-white/40 w-[20%]">
-                Logotipas
+              <th className="px-3 py-2 border-b border-white/40 w-[28%]">
+                Vardas, pavardė
               </th>
-              <th className="px-3 py-2 border-b border-white/40 w-[25%]">
-                Pavadinimas
-              </th>
-              <th className="px-3 py-2 border-b border-white/40 w-[25%]">
-                Alt tekstas
-              </th>
-              <th className="px-3 py-2 border-b border-white/40">
-                Image kelias
-              </th>
-              <th className="px-3 py-2 border-b border-white/40">
-                Veiksmai
-              </th>
+              <th className="px-3 py-2 border-b border-white/40 w-[24%]">El. paštas</th>
+              <th className="px-3 py-2 border-b border-white/40 w-[18%]">Telefonas</th>
+              <th className="px-3 py-2 border-b border-white/40 w-[18%]">Rolė</th>
+              <th className="px-3 py-2 border-b border-white/40">Veiksmai</th>
             </tr>
           </thead>
+
           <tbody>
             {loading ? (
               <tr>
@@ -207,53 +183,55 @@ export function PartnersPanel({ apiBase }: PartnersPanelProps) {
                   Kraunama...
                 </td>
               </tr>
-            ) : partners.length === 0 ? (
+            ) : workers.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-3 py-4 text-center">
-                  Partnerių nėra. Pridėk pirmą įrašą žemiau esančioje formoje.
+                  Darbuotojų nėra. Pridėk pirmą įrašą žemiau esančioje formoje.
                 </td>
               </tr>
             ) : (
-              partners.map((p) => (
-                <tr key={p.id} className="odd:bg-white/5 even:bg-white/0">
+              workers.map((w) => (
+                <tr key={w.id} className="odd:bg-white/5 even:bg-white/0">
                   <td className="px-3 py-2 border-b border-white/20 align-top">
-                    {p.image ? (
-                      <img
-                        src={p.image}
-                        alt={p.alt ?? p.name}
-                        className="max-h-12 max-w-[120px] object-contain bg-white rounded-md px-1 py-1"
-                      />
-                    ) : (
-                      <span className="opacity-60 text-xs">Nėra logotipo</span>
-                    )}
+                    <div className="font-semibold break-words">{w.fullName}</div>
                   </td>
+
                   <td className="px-3 py-2 border-b border-white/20 align-top">
-                    <div className="font-semibold">{p.name}</div>
-                  </td>
-                  <td className="px-3 py-2 border-b border-white/20 align-top">
-                    {p.alt || (
-                      <span className="opacity-60 text-xs">–</span>
-                    )}
-                  </td>
-                  <td className="px-3 py-2 border-b border-white/20 align-top">
-                    {p.imageSrc ? (
-                      <span className="break-all text-xs">{p.imageSrc}</span>
+                    {w.email ? (
+                      <span className="break-all">{w.email}</span>
                     ) : (
                       <span className="opacity-60 text-xs">–</span>
                     )}
                   </td>
+
+                  <td className="px-3 py-2 border-b border-white/20 align-top">
+                    {w.phone ? (
+                      <span className="break-all">{w.phone}</span>
+                    ) : (
+                      <span className="opacity-60 text-xs">–</span>
+                    )}
+                  </td>
+
+                  <td className="px-3 py-2 border-b border-white/20 align-top">
+                    {w.role ? (
+                      <span className="break-words">{w.role}</span>
+                    ) : (
+                      <span className="opacity-60 text-xs">–</span>
+                    )}
+                  </td>
+
                   <td className="px-3 py-2 border-b border-white/20 align-top">
                     <div className="flex flex-wrap gap-2">
                       <button
                         type="button"
-                        onClick={() => handleEditClick(p)}
+                        onClick={() => handleEditClick(w)}
                         className="text-xs px-3 py-1 rounded-full bg-black/70 hover:bg-black"
                       >
                         Redaguoti
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleDelete(p.id)}
+                        onClick={() => handleDelete(w.id)}
                         className="text-xs px-3 py-1 rounded-full bg-red-700 hover:bg-red-800"
                       >
                         Trinti
@@ -267,44 +245,55 @@ export function PartnersPanel({ apiBase }: PartnersPanelProps) {
         </table>
       </div>
 
-      {/* FORMA: Add / Edit */}
+      {/* FORM */}
       <section className="border border-white/60 rounded-2xl p-4 bg-[#22c55e]/60">
         <h3 className="text-lg font-semibold mb-2">
-          {editingId == null ? "Pridėti naują partnerį" : "Redaguoti partnerį"}
+          {editingId == null ? "Pridėti naują darbuotoją" : "Redaguoti darbuotoją"}
         </h3>
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <label className="text-sm">
-              Pavadinimas *
+            <label className="text-sm md:col-span-2">
+              Vardas ir pavardė (fullName) *
               <input
                 type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
                 className="mt-1 w-full rounded-md border border-black px-2 py-1 text-black text-sm"
                 required
               />
             </label>
 
             <label className="text-sm">
-              Alt tekstas (aprašas)
+              El. paštas
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="mt-1 w-full rounded-md border border-black px-2 py-1 text-black text-sm"
+                placeholder="vardas@imone.lt"
+              />
+            </label>
+
+            <label className="text-sm">
+              Telefonas
               <input
                 type="text"
-                value={alt}
-                onChange={(e) => setAlt(e.target.value)}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 className="mt-1 w-full rounded-md border border-black px-2 py-1 text-black text-sm"
-                placeholder="pvz. ERMC logotipas"
+                placeholder="+370..."
               />
             </label>
 
             <label className="text-sm md:col-span-2">
-              Logotipo failo kelias (imageSrc)
+              Rolė / pareigos
               <input
                 type="text"
-                value={imageSrc}
-                onChange={(e) => setImageSrc(e.target.value)}
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
                 className="mt-1 w-full rounded-md border border-black px-2 py-1 text-black text-sm"
-                placeholder="pvz. ermc_logo.png arba uploads/homepage-photos/..."
+                placeholder="Projektų vadovas, Meistras, ..."
               />
             </label>
           </div>
@@ -314,7 +303,7 @@ export function PartnersPanel({ apiBase }: PartnersPanelProps) {
               type="submit"
               className="px-4 py-1.5 rounded-full bg-black/80 hover:bg-black text-sm"
             >
-              {editingId == null ? "Sukurti partnerį" : "Išsaugoti pakeitimus"}
+              {editingId == null ? "Sukurti darbuotoją" : "Išsaugoti pakeitimus"}
             </button>
 
             {editingId != null && (
@@ -329,7 +318,6 @@ export function PartnersPanel({ apiBase }: PartnersPanelProps) {
           </div>
         </form>
       </section>
-      <PartneriaiPreviewPanel lang={lang} />
     </div>
   );
 }

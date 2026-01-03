@@ -159,10 +159,7 @@ export function ServicesPanel({ apiBase }: ServicesPanelProps) {
       {/* HEADER */}
       <header className="flex items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold mb-1">Paslaugų administravimas</h2>
-          <p className="text-sm opacity-90">
-            Čia gali pridėti, redaguoti ir trinti paslaugas, kurios rodomos svetainėje.
-          </p>
+          <h2 className="text-2xl font-semibold mb-1">Paslaugos</h2>
         </div>
 
         {/* kalbos pasirinkimas */}

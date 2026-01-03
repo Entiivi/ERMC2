@@ -29,6 +29,7 @@ import projectRcRouter from "./routes/projectRoutes/projectRc";
 import electricityAdminRouter from "./routes/projectRoutes/electricityProvider";
 import electricityPublicRouter from "./routes/electricityPublic";
 import projectElectricityRouter from "./routes/projectRoutes/projectProviders";
+import materialsRouter from "./routes/materials";
 
 
 import cron from "node-cron";
@@ -236,6 +237,7 @@ app.use("/projects", projectRcRouter);
 
 app.use("/admin/electricity-providers", electricityAdminRouter);
 app.use("/electricity", electricityPublicRouter);
+app.use("/materials", materialsRouter);
 app.use("/projects", projectElectricityRouter);
 
 

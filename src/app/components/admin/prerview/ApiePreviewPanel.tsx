@@ -15,7 +15,7 @@ export function ApiePreviewPanel({
   }, [frontendBase, lang]);
 
   return (
-    <div className="rounded-2xl bg-white/70 p-4">
+    <div className="rounded-2xl bg-white/70 p-4 w-full">
       <div className="flex items-center justify-between mb-2">
         <div className="text-sm font-semibold text-black">
           Paslaugų sekcijos peržiūra
@@ -29,7 +29,7 @@ export function ApiePreviewPanel({
         </a>
       </div>
 
-      <div className="h-[520px] rounded-xl overflow-hidden bg-white border">
+      <div className="h-[520px] rounded-xl overflow-hidden bg-white">
         <iframe
           src={src}
           className="w-full h-full"

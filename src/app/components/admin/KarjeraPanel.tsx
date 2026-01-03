@@ -201,11 +201,8 @@ export function CareersPanel({ apiBase }: CareersPanelProps) {
       <header className="flex items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-semibold mb-1">
-            Karjeros skelbimų administravimas
+            Karjera
           </h2>
-          <p className="text-sm opacity-90">
-            Čia gali pridėti, redaguoti ir trinti darbo skelbimus.
-          </p>
         </div>
 
         <div className="flex items-center gap-2">

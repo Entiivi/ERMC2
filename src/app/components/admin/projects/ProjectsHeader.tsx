@@ -27,12 +27,9 @@ export function ProjectsHeader({
   onResetForm,
 }: ProjectsHeaderProps) {
   return (
-    <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <header className="flex flex-col md:flex-row md:items-center md:justify-between">
       <div>
-        <h2 className="text-2xl font-semibold mb-1">Projektų administravimas</h2>
-        <p className="text-sm opacity-90">
-          Čia gali pridėti, redaguoti ir tvarkyti ERMC projektus.
-        </p>
+        <h2 className="text-2xl font-semibold">Projektai</h2>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">

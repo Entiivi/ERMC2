@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, FormEvent } from "react";
+import { useEffect, useState, FormEvent, useRef } from "react";
 import { ApiePreviewPanel } from "../admin/prerview/ApiePreviewPanel"
 type Lang = "LT" | "EN";
 
@@ -57,6 +57,19 @@ export function AboutPanel({ apiBase }: AboutPanelProps) {
   useEffect(() => {
     fetchAbout(lang);
   }, [lang]);
+
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const previewRef = useRef<HTMLDivElement | null>(null);
+  
+    useEffect(() => {
+      if (!previewOpen) return;
+  
+      const t = window.setTimeout(() => {
+        previewRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+      }, 320);
+  
+      return () => window.clearTimeout(t);
+    }, [previewOpen]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -154,10 +167,7 @@ export function AboutPanel({ apiBase }: AboutPanelProps) {
       {/* Header */}
       <header className="flex items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold mb-1">„Apie mus“ administravimas</h2>
-          <p className="text-sm opacity-90">
-            Čia gali kurti, redaguoti ir trinti „Apie mus“ sekcijos blokų tekstus.
-          </p>
+          <h2 className="text-2xl font-semibold mb-1">Apie mus</h2>
         </div>
 
         <div className="flex items-center gap-2">
@@ -329,7 +339,20 @@ export function AboutPanel({ apiBase }: AboutPanelProps) {
           </div>
         </form>
       </section>
-      <ApiePreviewPanel lang={lang} />
+            <div ref={previewRef}
+              className="scroll-mt-[100vh]"
+            >
+              <div
+                className={[
+                  "grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out",
+                  previewOpen ? "grid-rows-[1fr] opacity-100 mt-4" : "grid-rows-[0fr] opacity-0 mt-0",
+                ].join(" ")}
+              >
+                <div className="min-h-0 overflow-hidden">
+                  <ApiePreviewPanel lang={lang} />
+                </div>
+              </div>
+            </div>
     </div>
   );
 }

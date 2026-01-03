@@ -192,12 +192,9 @@ export function ContactsPanel({ apiBase }: ContactsPanelProps) {
       <header className="flex items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-semibold mb-1">
-            Kontaktų administravimas
+            Kontaktai
           </h2>
-          <p className="text-sm opacity-90">
-            Čia gali pridėti, redaguoti ir trinti kontaktinę informaciją, kuri
-            rodoma puslapio apačioje.
-          </p>
+
         </div>
 
         <div className="flex items-center gap-2">
