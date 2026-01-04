@@ -145,8 +145,13 @@ export function WorkersPanel({ apiBase }: WorkersPanelProps) {
     }
   };
 
+  const actionBtn =
+    "px-6 py-3 cursor-pointer select-none transition-transform duration-200 hover:scale-105 hover:text-[#14b8a6]";
+
+  const dangerBtnSm =
+    "text-xs px-3 py-1 cursor-pointer select-none transition-transform duration-200 hover:scale-105 hover:text-[#ef4444]";
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-x-hidden">
       {/* HEADER */}
       <header className="flex items-center justify-between gap-4">
         <div>
@@ -162,7 +167,7 @@ export function WorkersPanel({ apiBase }: WorkersPanelProps) {
       )}
 
       {/* TABLE */}
-      <div className="border border-white/70 rounded-2xl overflow-hidden bg-[#22c55e]/40">
+      <div className=" rounded-2xl overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-black/20">
             <tr className="text-left">
@@ -200,7 +205,7 @@ export function WorkersPanel({ apiBase }: WorkersPanelProps) {
                     {w.email ? (
                       <span className="break-all">{w.email}</span>
                     ) : (
-                      <span className="opacity-60 text-xs">–</span>
+                      <span className="opacity-60 text-xs">-</span>
                     )}
                   </td>
 
@@ -208,7 +213,7 @@ export function WorkersPanel({ apiBase }: WorkersPanelProps) {
                     {w.phone ? (
                       <span className="break-all">{w.phone}</span>
                     ) : (
-                      <span className="opacity-60 text-xs">–</span>
+                      <span className="opacity-60 text-xs">-</span>
                     )}
                   </td>
 
@@ -216,26 +221,27 @@ export function WorkersPanel({ apiBase }: WorkersPanelProps) {
                     {w.role ? (
                       <span className="break-words">{w.role}</span>
                     ) : (
-                      <span className="opacity-60 text-xs">–</span>
+                      <span className="opacity-60 text-xs">-</span>
                     )}
                   </td>
 
                   <td className="px-3 py-2 border-b border-white/20 align-top">
-                    <div className="flex flex-wrap gap-2">
-                      <button
+                    <div className="flex flex-wrap gap-[1vh]">
+                      <a
                         type="button"
                         onClick={() => handleEditClick(w)}
-                        className="text-xs px-3 py-1 rounded-full bg-black/70 hover:bg-black"
+                        className={actionBtn}
                       >
                         Redaguoti
-                      </button>
-                      <button
+                      </a>
+
+                      <a
                         type="button"
                         onClick={() => handleDelete(w.id)}
-                        className="text-xs px-3 py-1 rounded-full bg-red-700 hover:bg-red-800"
+                        className={dangerBtnSm}
                       >
                         Trinti
-                      </button>
+                      </a>
                     </div>
                   </td>
                 </tr>
@@ -246,7 +252,7 @@ export function WorkersPanel({ apiBase }: WorkersPanelProps) {
       </div>
 
       {/* FORM */}
-      <section className="border border-white/60 rounded-2xl p-4 bg-[#22c55e]/60">
+      <section className="rounded-2xl pl-[1vw]">
         <h3 className="text-lg font-semibold mb-2">
           {editingId == null ? "Pridėti naują darbuotoją" : "Redaguoti darbuotoją"}
         </h3>
@@ -298,22 +304,22 @@ export function WorkersPanel({ apiBase }: WorkersPanelProps) {
             </label>
           </div>
 
-          <div className="flex flex-wrap gap-2 pt-2">
-            <button
+          <div className="flex flex-wrap gap-[2vw] pt-[1vh]">
+            <a
               type="submit"
-              className="px-4 py-1.5 rounded-full bg-black/80 hover:bg-black text-sm"
+              className={actionBtn}
             >
               {editingId == null ? "Sukurti darbuotoją" : "Išsaugoti pakeitimus"}
-            </button>
+            </a>
 
             {editingId != null && (
-              <button
+              <a
                 type="button"
                 onClick={resetForm}
-                className="px-4 py-1.5 rounded-full bg-white/80 hover:bg-white text-sm text-black"
+                className={dangerBtnSm}
               >
                 Atšaukti redagavimą
-              </button>
+              </a>
             )}
           </div>
         </form>

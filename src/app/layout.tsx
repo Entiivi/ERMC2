@@ -54,9 +54,19 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   const noFooterPages = ["/admin"];
   const hideFooter = noFooterPages.some((p) => pathname.startsWith(p));
 
+  const noDottedBgPages = [
+    "/admin",
+  ];
+
+  const hideDottedBg = noDottedBgPages.some((p) =>
+    pathname.startsWith(p)
+  );
+
   return (
     <>
-      <DottedBackground spacing={20} dotColor="#000000" />
+      {!hideDottedBg && (
+        <DottedBackground spacing={20} dotColor="#000000" />
+      )}
 
       {!hideHeader && (
         <header

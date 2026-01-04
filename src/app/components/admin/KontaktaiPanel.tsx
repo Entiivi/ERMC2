@@ -2,6 +2,7 @@
 
 import { useEffect, useState, FormEvent } from "react";
 import { FooterPreviewPanel } from "../admin/prerview/FooterPreviewPanel"
+import { IconPicker } from "@/app/components/admin/IconPicker";
 
 type Lang = "LT" | "EN";
 
@@ -222,7 +223,7 @@ export function ContactsPanel({ apiBase }: ContactsPanelProps) {
       )}
 
       {/* LENTELĖ */}
-      <div className="border border-white/70 rounded-2xl overflow-hidden bg-[#22c55e]/40">
+      <div className="rounded-2xl overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-black/20">
             <tr className="text-left">
@@ -306,7 +307,7 @@ export function ContactsPanel({ apiBase }: ContactsPanelProps) {
       </div>
 
       {/* FORMA */}
-      <section className="border border-white/60 rounded-2xl p-4 bg-[#22c55e]/60">
+      <section className="rounded-2xl p-4">
         <h3 className="text-lg font-semibold mb-2">
           {editingId == null ? "Pridėti naują kontaktą" : "Redaguoti kontaktą"}
         </h3>
@@ -348,16 +349,11 @@ export function ContactsPanel({ apiBase }: ContactsPanelProps) {
               />
             </label>
 
-            <label className="text-sm md:col-span-2">
-              Ikonos kelias (pasirinktinai)
-              <input
-                type="text"
-                value={icon}
-                onChange={(e) => setIcon(e.target.value)}
-                className="mt-1 w-full rounded-md border border-black px-2 py-1 text-black text-sm"
-                placeholder="/icons/phone.svg"
-              />
-            </label>
+            <IconPicker
+              apiBase={apiBase}
+              value={icon}
+              onChange={setIcon}
+            />
 
             <label className="text-sm flex items-center gap-2 md:col-span-2">
               <input

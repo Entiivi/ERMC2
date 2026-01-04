@@ -280,8 +280,11 @@ export function MaterialsPanel({ apiBase }: MaterialsPanelProps) {
     }
   };
 
+  const actionBtn =
+    "px-6 py-3 cursor-pointer select-none transition-transform duration-200 hover:scale-105 hover:text-[#14b8a6]";
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pl-[1vw] overflow-x-hidden">
       {/* HEADER */}
       <header className="flex items-start justify-between gap-4">
         <div>
@@ -307,7 +310,7 @@ export function MaterialsPanel({ apiBase }: MaterialsPanelProps) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Paieška: cementas, sku, kategorija..."
-            className="w-72 max-w-full rounded-md border border-black px-2 py-1 text-black text-sm"
+            className="w-72 max-w-full rounded-md px-2 py-1 text-black text-sm"
           />
         </div>
       </header>
@@ -320,7 +323,7 @@ export function MaterialsPanel({ apiBase }: MaterialsPanelProps) {
       )}
 
       {/* TABLE */}
-      <div className="border border-white/70 rounded-2xl overflow-hidden bg-[#22c55e]/40">
+      <div className="rounded-2xl overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-black/20">
             <tr className="text-left">
@@ -350,23 +353,23 @@ export function MaterialsPanel({ apiBase }: MaterialsPanelProps) {
             ) : (
               filtered.map((m) => (
                 <tr key={m.key} className="odd:bg-white/5 even:bg-white/0">
-                  <td className="px-3 py-2 border-b border-white/20 align-top">
+                  <td className="px-3 py-2 align-top">
                     <div className="font-mono text-xs break-all">{m.key}</div>
                     {m.sku ? <div className="text-xs opacity-80 break-all">SKU: {m.sku}</div> : null}
                   </td>
 
-                  <td className="px-3 py-2 border-b border-white/20 align-top">
+                  <td className="px-3 py-2 align-top">
                     <div className="font-semibold break-words">{m.name}</div>
                     {m.brand ? <div className="text-xs opacity-80">{m.brand}</div> : null}
                   </td>
 
-                  <td className="px-3 py-2 border-b border-white/20 align-top">{m.unit}</td>
+                  <td className="px-3 py-2 align-top">{m.unit}</td>
 
-                  <td className="px-3 py-2 border-b border-white/20 align-top">
+                  <td className="px-3 py-2 align-top">
                     {m.category ? m.category : <span className="opacity-60 text-xs">–</span>}
                   </td>
 
-                  <td className="px-3 py-2 border-b border-white/20 align-top">
+                  <td className="px-3 py-2 align-top">
                     {m.currentPrice?.price ? (
                       <div className="text-xs">
                         <div className="font-semibold">
@@ -381,7 +384,7 @@ export function MaterialsPanel({ apiBase }: MaterialsPanelProps) {
                     )}
                   </td>
 
-                  <td className="px-3 py-2 border-b border-white/20 align-top">
+                  <td className="px-3 py-2 align-top">
                     {m.isActive ? (
                       <span className="text-xs px-2 py-0.5 rounded-full bg-black/50">Taip</span>
                     ) : (
@@ -391,7 +394,7 @@ export function MaterialsPanel({ apiBase }: MaterialsPanelProps) {
                     )}
                   </td>
 
-                  <td className="px-3 py-2 border-b border-white/20 align-top">
+                  <td className="px-3 py-2 align-top">
                     <div className="flex flex-wrap gap-2">
                       <button
                         type="button"
@@ -417,7 +420,7 @@ export function MaterialsPanel({ apiBase }: MaterialsPanelProps) {
       </div>
 
       {/* FORM */}
-      <section className="border border-white/60 rounded-2xl p-4 bg-[#22c55e]/60">
+      <section className="rounded-2xl p-4">
         <h3 className="text-lg font-semibold mb-2">
           {editingKey == null ? "Pridėti naują medžiagą" : `Redaguoti medžiagą: ${editingKey}`}
         </h3>
@@ -541,8 +544,7 @@ export function MaterialsPanel({ apiBase }: MaterialsPanelProps) {
             </label>
 
             {/* PRICE BLOCK (optional route) */}
-            <div className="md:col-span-2 border border-black/40 rounded-xl p-3 bg-black/10">
-              <div className="text-sm font-semibold mb-2">Aktuali kaina (pasirinktinai)</div>
+            <div className="md:col-span-2 rounded-xl p-3 bg-black/10">
 
               <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <label className="text-sm">
@@ -592,40 +594,37 @@ export function MaterialsPanel({ apiBase }: MaterialsPanelProps) {
                   />
                 </label>
               </div>
-
-              <div className="mt-3 text-xs opacity-90">
-                Pastaba: mygtukas „Išsaugoti kainą“ veiks tik jei turi endpointą{" "}
-                <span className="font-mono">POST /materials/:key/prices</span>.
-              </div>
-
-              <div className="flex flex-wrap gap-2 mt-3">
-                <button
-                  type="button"
-                  onClick={handleSavePrice}
-                  className="px-4 py-1.5 rounded-full bg-black/80 hover:bg-black text-sm"
-                >
-                  Išsaugoti kainą
-                </button>
-              </div>
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2 pt-2">
-            <button
+          <div className="flex items-center gap-[3vw] mt-[1vh] pl-[1vw]">
+
+            <a
               type="submit"
-              className="px-4 py-1.5 rounded-full bg-black/80 hover:bg-black text-sm"
+              className={actionBtn}
             >
               {editingKey == null ? "Sukurti medžiagą" : "Išsaugoti pakeitimus"}
-            </button>
+            </a>
+
+            <div className="flex flex-wrap gap-2 mt-3">
+              <a
+                type="button"
+                onClick={handleSavePrice}
+                className={actionBtn}
+              >
+                Išsaugoti kainą
+              </a>
+            </div>
+
 
             {editingKey != null && (
-              <button
+              <a
                 type="button"
                 onClick={resetForm}
-                className="px-4 py-1.5 rounded-full bg-white/80 hover:bg-white text-sm text-black"
+                className={actionBtn}
               >
                 Atšaukti redagavimą
-              </button>
+              </a>
             )}
           </div>
         </form>

@@ -1,5 +1,6 @@
 // components/admin/projects/ProjectsHeader.tsx
 
+import { useState } from "react";
 import { Lang } from "../projects/type";
 
 type ProjectsHeaderProps = {
@@ -16,6 +17,10 @@ type ProjectsHeaderProps = {
   onResetForm: () => void;
 };
 
+const style =
+  "[all:unset] box-border flex items-center px-3 py-1.5 text-sm font-inherit text-inherit bg-white/90 rounded-md cursor-text";
+
+
 export function ProjectsHeader({
   lang,
   onLangChange,
@@ -26,37 +31,52 @@ export function ProjectsHeader({
   availableTags,
   onResetForm,
 }: ProjectsHeaderProps) {
+
+  const [selectOpen, setSelectOpen] = useState(false);
   return (
     <header className="flex flex-col md:flex-row md:items-center md:justify-between">
       <div>
         <h2 className="text-2xl font-semibold">Projektai</h2>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-[1vw]">
         <input
           type="text"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Paieška pagal pavadinimą, klientą ar aprašymą…"
-          className="rounded-full px-3 py-1.5 text-sm text-black min-w-[200px]"
+          placeholder="Paieška..."
+          className={style}
+          style={{ minWidth: 100 }}
         />
 
-        <select
-          value={tagFilter}
-          onChange={(e) =>
-            onTagFilterChange(
-              e.target.value === "ALL" ? "ALL" : e.target.value
-            )
-          }
-          className="rounded-full px-3 py-1.5 text-sm text-black"
-        >
-          <option value="ALL">Visos žymos</option>
-          {availableTags.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
+        <div className="hover:scale-105 hover:text-[#14b8a6] transition-transform duration-200 flex items-center gap-2 cursor-pointer select-none">
+          <select
+            value={tagFilter}
+            onFocus={() => setSelectOpen(true)}
+            onBlur={() => setSelectOpen(false)}
+            onChange={(e) => {
+              onTagFilterChange(e.target.value === "ALL" ? "ALL" : e.target.value);
+              setSelectOpen(false);
+            }}
+            className={[
+              style,
+            ].join(" ")}
+          >
+            <option value="ALL">Visos žymos</option>
+            {availableTags.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+
+          <span
+            className={`block scale-150 transition-transform duration-200 pointer-events-none ${selectOpen ? "rotate-180" : ""
+              }`}
+          >
+            ▾
+          </span>
+        </div>
 
         <select
           value={lang}
@@ -65,7 +85,7 @@ export function ProjectsHeader({
             onLangChange(newLang);
             onResetForm();
           }}
-          className="rounded-full px-3 py-1.5 text-sm text-black"
+          className={"py-1.5 text-sm text-black"}
         >
           <option value="LT">LT</option>
           <option value="EN">EN</option>

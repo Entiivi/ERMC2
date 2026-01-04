@@ -68,45 +68,39 @@ export function PartnersPanel({ apiBase }: PartnersPanelProps) {
       return;
     }
 
-    const payload = {
-      name: name.trim(),
-      imageSrc: imageSrc.trim() || null,
-      imageAlt: alt.trim() || null,
-      lang,
-    };
-
     try {
       setError(null);
 
-      if (editingId == null) {
-        // CREATE
-        const res = await fetch(`${apiBase}/partneriai`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          throw new Error(
-            body.error || `Nepavyko sukurti partnerio (status ${res.status})`
-          );
+      const form = new FormData();
+      form.append("name", name.trim());
+      form.append("lang", lang);
+      if (alt.trim()) form.append("imageAlt", alt.trim());
+      if (selectedFile) form.append("file", selectedFile); // ⭐ ČIA SVARBIAUSIA
+
+      const res = await fetch(
+        editingId == null
+          ? `${apiBase}/partneriai`
+          : `${apiBase}/partneriai/${editingId}`,
+        {
+          method: editingId == null ? "POST" : "PUT",
+          body: form, // ⬅️ multipart/form-data
         }
-      } else {
-        // UPDATE
-        const res = await fetch(`${apiBase}/partneriai/${editingId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          throw new Error(
-            body.error || `Nepavyko atnaujinti partnerio (status ${res.status})`
-          );
-        }
+      );
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(
+          body.error || `Nepavyko išsaugoti partnerio (status ${res.status})`
+        );
       }
 
+      const saved = await res.json();
+
+      // ⬇️ backend grąžina imageSrc (failo pavadinimą)
+      setImageSrc(saved.imageSrc ?? "");
+
       resetForm();
+      setSelectedFile(null);
       await fetchPartners(lang);
     } catch (err: any) {
       console.error("Save error:", err);
@@ -142,6 +136,8 @@ export function PartnersPanel({ apiBase }: PartnersPanelProps) {
       setError(err?.message ?? "Nepavyko ištrinti partnerio");
     }
   };
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   return (
     <div className="space-y-6">
@@ -179,7 +175,7 @@ export function PartnersPanel({ apiBase }: PartnersPanelProps) {
       )}
 
       {/* LENTELĖ */}
-      <div className="border border-white/70 rounded-2xl overflow-hidden bg-[#22c55e]/40">
+      <div className="overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-black/20">
             <tr className="text-left">
@@ -216,7 +212,7 @@ export function PartnersPanel({ apiBase }: PartnersPanelProps) {
             ) : (
               partners.map((p) => (
                 <tr key={p.id} className="odd:bg-white/5 even:bg-white/0">
-                  <td className="px-3 py-2 border-b border-white/20 align-top">
+                  <td className="px-3 py-2 align-top">
                     {p.image ? (
                       <img
                         src={p.image}
@@ -242,7 +238,7 @@ export function PartnersPanel({ apiBase }: PartnersPanelProps) {
                       <span className="opacity-60 text-xs">–</span>
                     )}
                   </td>
-                  <td className="px-3 py-2 border-b border-white/20 align-top">
+                  <td className="px-3 py-2 align-top">
                     <div className="flex flex-wrap gap-2">
                       <button
                         type="button"
@@ -268,7 +264,7 @@ export function PartnersPanel({ apiBase }: PartnersPanelProps) {
       </div>
 
       {/* FORMA: Add / Edit */}
-      <section className="border border-white/60 rounded-2xl p-4 bg-[#22c55e]/60">
+      <section className=" rounded-2xl p-4">
         <h3 className="text-lg font-semibold mb-2">
           {editingId == null ? "Pridėti naują partnerį" : "Redaguoti partnerį"}
         </h3>
@@ -298,13 +294,26 @@ export function PartnersPanel({ apiBase }: PartnersPanelProps) {
             </label>
 
             <label className="text-sm md:col-span-2">
-              Logotipo failo kelias (imageSrc)
+              Partnerio logotipas
+
+              {/* preview */}
+              {imageSrc && (
+                <img
+                  src={`/uploads/homepage-photos/partneriai-photos/${imageSrc}`}
+                  alt="Partner logo preview"
+                  className="mt-2 h-16 object-contain border border-black bg-white p-2"
+                />
+              )}
+
               <input
-                type="text"
-                value={imageSrc}
-                onChange={(e) => setImageSrc(e.target.value)}
-                className="mt-1 w-full rounded-md border border-black px-2 py-1 text-black text-sm"
-                placeholder="pvz. ermc_logo.png arba uploads/homepage-photos/..."
+                type="file"
+                accept="image/png,image/jpeg,image/jpg,image/svg+xml"
+                className="mt-2 block w-full text-sm text-black"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  setSelectedFile(file); // naujas state
+                }}
               />
             </label>
           </div>

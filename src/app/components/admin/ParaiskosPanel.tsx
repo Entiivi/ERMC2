@@ -28,11 +28,14 @@ export function ParaiskosPanel({ apiBase }: Props) {
     position: string;
     cvUrl: string;
     message: string;
+    cvFile?: File | null;
   } | null>(null);
   const [savingParaiska, setSavingParaiska] = useState(false);
   const [paraiskaFormError, setParaiskaFormError] = useState<string | null>(
     null
   );
+
+  
 
   useEffect(() => {
     let cancelled = false;
@@ -70,6 +73,7 @@ export function ParaiskosPanel({ apiBase }: Props) {
       position: "",
       cvUrl: "",
       message: "",
+
     });
   };
 
@@ -113,21 +117,31 @@ export function ParaiskosPanel({ apiBase }: Props) {
       setParaiskaFormError(null);
 
       const isEdit = Boolean(paraiskaForm.id);
-      const base = `${apiBase}/admin/paraiskos`;
+      const base = `${apiBase}/paraiskos`;
       const url = isEdit ? `${base}/${paraiskaForm.id}` : base;
       const method = isEdit ? "PUT" : "POST";
 
+      // FormData vietoj JSON
+      const fd = new FormData();
+      fd.append("name", paraiskaForm.name);
+      fd.append("email", paraiskaForm.email);
+      fd.append("phone", paraiskaForm.phone || "");
+      fd.append("position", paraiskaForm.position);
+      fd.append("message", paraiskaForm.message || "");
+
+      // jei vis dar nori leisti įvesti URL ranka (optional)
+      // jei nenori – šitą eilutę gali išmesti
+      if (paraiskaForm.cvUrl) fd.append("cvUrl", paraiskaForm.cvUrl);
+
+      // SVARBIAUSIA: field name "cv" turi sutapti su upload.single("cv")
+      if (paraiskaForm.cvFile) {
+        fd.append("cv", paraiskaForm.cvFile);
+      }
+
       const res = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: paraiskaForm.name,
-          email: paraiskaForm.email,
-          phone: paraiskaForm.phone || null,
-          position: paraiskaForm.position,
-          cvUrl: paraiskaForm.cvUrl || null,
-          message: paraiskaForm.message || null,
-        }),
+        body: fd,
+        // be headers Content-Type. Browser pats uždės multipart boundary.
       });
 
       if (!res.ok) {
@@ -154,23 +168,29 @@ export function ParaiskosPanel({ apiBase }: Props) {
     }
   };
 
+  const actionBtn =
+    "[all:unset] inline-flex bg-transparent border-none outline-none appearance-none px-6 py-3 !cursor-pointer select-none transition-transform duration-200 hover:scale-105 hover:text-[#14b8a6]";
+
+  const dangerBtnSm =
+    "text-xs px-3 py-1 cursor-pointer select-none transition-transform duration-200 hover:scale-105 hover:text-[#ef4444]";
+
+
   return (
     <>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 pl-[1.4vw]">
         <h2 className="text-xl font-semibold">Paraiškos</h2>
-        <button
+        <a
           onClick={startCreateParaiska}
-          className="text-sm px-3 py-1 rounded-md border border-teal-600 text-teal-700 hover:bg-teal-50"
+          className={actionBtn}
         >
           + Nauja paraiška
-        </button>
+        </a>
       </div>
 
       {loading && <p className="mb-2 text-sm text-slate-100/80">Kraunama…</p>}
       {err && <p className="mb-2 text-sm text-red-200">{err}</p>}
 
-      {/* table wrapper - no background, let green bubble show */}
-      <div className="rounded-xl overflow-hidden mb-4">
+      <div className="rounded-xl overflow-hidden mb-4 pl-[1vw]">
         <table className="w-full text-sm">
           <thead>
             <tr>
@@ -179,7 +199,7 @@ export function ParaiskosPanel({ apiBase }: Props) {
               <th className="px-3 py-2 text-left">Pozicija</th>
               <th className="px-3 py-2 text-left">CV</th>
               <th className="px-3 py-2 text-left">Data</th>
-              <th className="px-3 py-2" />
+              <th className="px-3 py-2">Veiksmai</th>
             </tr>
           </thead>
           <tbody>
@@ -191,7 +211,7 @@ export function ParaiskosPanel({ apiBase }: Props) {
                 <td className="px-3 py-2">
                   {p.cvUrl ? (
                     <a
-                      href={p.cvUrl}
+                      href={`${apiBase}${p.cvUrl.trim().replace(/^\/uploads\/cv\//, "/uploadsCV/cv/")}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-teal-200 hover:underline"
@@ -205,19 +225,19 @@ export function ParaiskosPanel({ apiBase }: Props) {
                 <td className="px-3 py-2">
                   {new Date(p.createdAt).toLocaleString("lt-LT")}
                 </td>
-                <td className="px-3 py-2 text-right space-x-3">
-                  <button
+                <td className="flex flex-wrap gap-[1vh]">
+                  <a
                     onClick={() => startEditParaiska(p)}
-                    className="text-xs text-teal-100 hover:underline"
+                    className={actionBtn}
                   >
                     Redaguoti
-                  </button>
-                  <button
+                  </a>
+                  <a
                     onClick={() => deleteParaiska(p.id)}
-                    className="text-xs text-red-200 hover:underline"
+                    className={dangerBtnSm}
                   >
                     Ištrinti
-                  </button>
+                  </a>
                 </td>
               </tr>
             ))}
@@ -233,7 +253,7 @@ export function ParaiskosPanel({ apiBase }: Props) {
       </div>
 
       {paraiskaForm && (
-        <div className="mt-2 rounded-xl p-4 border border-white/40 bg-black/10">
+        <div className="pl-[1vw] mt-2 rounded-xl p-4 bg-black/10">
           <h3 className="font-semibold mb-3">
             {paraiskaForm.id ? "Redaguoti paraišką" : "Nauja paraiška"}
           </h3>
@@ -252,7 +272,7 @@ export function ParaiskosPanel({ apiBase }: Props) {
                     prev ? { ...prev, name: e.target.value } : prev
                   )
                 }
-                className="w-full border rounded-md px-2 py-1 text-sm text-black"
+                className="w-full px-2 py-1 text-sm text-black"
               />
             </div>
 
@@ -268,7 +288,7 @@ export function ParaiskosPanel({ apiBase }: Props) {
                     prev ? { ...prev, email: e.target.value } : prev
                   )
                 }
-                className="w-full border rounded-md px-2 py-1 text-sm text-black"
+                className="w-full px-2 py-1 text-sm text-black"
               />
             </div>
 
@@ -284,7 +304,7 @@ export function ParaiskosPanel({ apiBase }: Props) {
                     prev ? { ...prev, phone: e.target.value } : prev
                   )
                 }
-                className="w-full border rounded-md px-2 py-1 text-sm text-black"
+                className="w-full px-2 py-1 text-sm text-black"
               />
             </div>
 
@@ -300,25 +320,32 @@ export function ParaiskosPanel({ apiBase }: Props) {
                     prev ? { ...prev, position: e.target.value } : prev
                   )
                 }
-                className="w-full border rounded-md px-2 py-1 text-sm text-black"
+                className="w-full px-2 py-1 text-sm text-black"
               />
             </div>
 
             <div className="md:col-span-2">
               <label className="block text-xs font-medium mb-1">
-                CV nuoroda (URL)
+                CV (PDF)
               </label>
+
               <input
-                type="text"
-                value={paraiskaForm.cvUrl}
-                onChange={(e) =>
+                type="file"
+                accept=".pdf"
+                onChange={(e) => {
+                  const file = e.target.files?.[0] || null;
                   setParaiskaForm((prev) =>
-                    prev ? { ...prev, cvUrl: e.target.value } : prev
-                  )
-                }
-                className="w-full border rounded-md px-2 py-1 text-sm text-black"
-                placeholder="https://..."
+                    prev ? { ...prev, cvFile: file } : prev
+                  );
+                }}
+                className="w-full text-sm text-black file:mr-3 file:px-3 file:py-1 file:rounded-md file:border-0 file:bg-neutral-200 file:text-black hover:file:bg-neutral-300"
               />
+
+              {paraiskaForm.cvFile && (
+                <p className="text-xs text-white/60 mt-1">
+                  Pasirinkta: {paraiskaForm.cvFile.name}
+                </p>
+              )}
             </div>
 
             <div className="md:col-span-2">
@@ -330,25 +357,26 @@ export function ParaiskosPanel({ apiBase }: Props) {
                     prev ? { ...prev, message: e.target.value } : prev
                   )
                 }
-                className="w-full border rounded-md px-2 py-1 text-sm min-h-[80px] text-black"
+                className="w-full py-1 text-sm min-h-[80px] text-black"
               />
             </div>
 
-            <div className="md:col-span-2 flex gap-2">
+            <div className="md:col-span-2 flex gap-[1vw]">
               <button
                 type="submit"
                 disabled={savingParaiska}
-                className="px-3 py-1 rounded-md bg-teal-600 text-white text-sm hover:bg-teal-700 disabled:opacity-60"
+                className={`${actionBtn} bg-transparent border-none outline-none appearance-none ${savingParaiska ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
               >
                 {savingParaiska ? "Saugoma…" : "Išsaugoti"}
               </button>
-              <button
+              <a
                 type="button"
                 onClick={cancelParaiskaForm}
-                className="px-3 py-1 rounded-md border text-sm"
+                className={dangerBtnSm}
               >
                 Atšaukti
-              </button>
+              </a>
             </div>
           </form>
 

@@ -58,18 +58,18 @@ export function AboutPanel({ apiBase }: AboutPanelProps) {
     fetchAbout(lang);
   }, [lang]);
 
-    const [previewOpen, setPreviewOpen] = useState(false);
-    const previewRef = useRef<HTMLDivElement | null>(null);
-  
-    useEffect(() => {
-      if (!previewOpen) return;
-  
-      const t = window.setTimeout(() => {
-        previewRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-      }, 320);
-  
-      return () => window.clearTimeout(t);
-    }, [previewOpen]);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const previewRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!previewOpen) return;
+
+    const t = window.setTimeout(() => {
+      previewRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    }, 320);
+
+    return () => window.clearTimeout(t);
+  }, [previewOpen]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -162,6 +162,14 @@ export function AboutPanel({ apiBase }: AboutPanelProps) {
     }
   };
 
+
+
+  const actionBtn =
+    "px-6 py-3 cursor-pointer select-none transition-transform duration-200 hover:scale-105 hover:text-[#14b8a6]";
+
+  const dangerBtnSm =
+    "text-xs px-3 py-1 cursor-pointer select-none transition-transform duration-200 hover:scale-105 hover:text-[#ef4444]";
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -195,7 +203,7 @@ export function AboutPanel({ apiBase }: AboutPanelProps) {
       )}
 
       {/* LENTELĖ */}
-      <div className="border border-white/70 rounded-2xl overflow-hidden bg-[#22c55e]/40">
+      <div className="rounded-2xl overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-black/20">
             <tr className="text-left">
@@ -245,21 +253,21 @@ export function AboutPanel({ apiBase }: AboutPanelProps) {
                     )}
                   </td>
                   <td className="px-3 py-2 border-b border-white/20 align-top">
-                    <div className="flex flex-wrap gap-2">
-                      <button
+                    <div className="flex flex-wrap gap-[1vw]">
+                      <a
                         type="button"
                         onClick={() => handleEditClick(item)}
-                        className="text-xs px-3 py-1 rounded-full bg-black/70 hover:bg-black"
+                        className={actionBtn}
                       >
                         Redaguoti
-                      </button>
-                      <button
+                      </a>
+                      <a
                         type="button"
                         onClick={() => handleDelete(item.id)}
-                        className="text-xs px-3 py-1 rounded-full bg-red-700 hover:bg-red-800"
+                        className={dangerBtnSm}
                       >
                         Trinti
-                      </button>
+                      </a>
                     </div>
                   </td>
                 </tr>
@@ -270,7 +278,7 @@ export function AboutPanel({ apiBase }: AboutPanelProps) {
       </div>
 
       {/* FORMA */}
-      <section className="border border-white/60 rounded-2xl p-4 bg-[#22c55e]/60">
+      <section className="rounded-2xl p-4 pl-[1vw]">
         <h3 className="text-lg font-semibold mb-2">
           {editingId == null
             ? "Pridėti naują „Apie mus“ bloką"
@@ -317,42 +325,64 @@ export function AboutPanel({ apiBase }: AboutPanelProps) {
             </label>
           </div>
 
-          <div className="flex flex-wrap gap-2 pt-2">
-            <button
+          <div className="flex flex-wrap gap-[1vw] pt-2">
+            <a
               type="submit"
-              className="px-4 py-1.5 rounded-full bg-black/80 hover:bg-black text-sm"
+              className={actionBtn}
             >
               {editingId == null
                 ? "Sukurti bloką"
                 : "Išsaugoti pakeitimus"}
-            </button>
+            </a>
 
             {editingId != null && (
-              <button
+              <a
                 type="button"
                 onClick={resetForm}
-                className="px-4 py-1.5 rounded-full bg-white/80 hover:bg-white text-sm text-black"
+                className={dangerBtnSm}
               >
                 Atšaukti redagavimą
-              </button>
+              </a>
+
+
             )}
+
+            <a
+              type="button"
+              onClick={() => setPreviewOpen((v) => !v)}
+              className="p-2 rounded-full hover:bg-black/10 transition"
+              aria-label="Toggle projektų peržiūra"
+            >
+              <div className="hover:scale-105 hover:text-[#14b8a6] transition-transform duration-200 pt-2 flex items-center gap-2 cursor-pointer select-none">
+                <span>
+                  Peržiūra
+                </span>
+                <span
+                  className={`block scale-150 transition-transform duration-200 ${previewOpen ? "rotate-180" : ""
+                    }`}
+                >
+                  ▾
+                </span>
+              </div>
+
+            </a>
           </div>
         </form>
       </section>
-            <div ref={previewRef}
-              className="scroll-mt-[100vh]"
-            >
-              <div
-                className={[
-                  "grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out",
-                  previewOpen ? "grid-rows-[1fr] opacity-100 mt-4" : "grid-rows-[0fr] opacity-0 mt-0",
-                ].join(" ")}
-              >
-                <div className="min-h-0 overflow-hidden">
-                  <ApiePreviewPanel lang={lang} />
-                </div>
-              </div>
-            </div>
+      <div ref={previewRef}
+        className="scroll-mt-[100vh]"
+      >
+        <div
+          className={[
+            "grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out",
+            previewOpen ? "grid-rows-[1fr] opacity-100 mt-4" : "grid-rows-[0fr] opacity-0 mt-0",
+          ].join(" ")}
+        >
+          <div className="min-h-0 overflow-hidden">
+            <ApiePreviewPanel lang={lang} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,17 +1,48 @@
 import { Router } from "express";
 import fs from "fs";
 import path from "path";
+import multer from "multer";
 import { prisma } from "../prisma";
 import { Lang } from "@prisma/client";
 
 const r = Router();
+
+/* =========================
+   UPLOAD KONFIGŪRACIJA
+========================= */
 
 const partnerPhotoDir = path.join(
   __dirname,
   "../../uploads/homepage-photos/partneriai-photos"
 );
 
-// GET /partneriai?lang=LT arba /partneriai?lang=EN
+// užtikrinam, kad katalogas egzistuoja
+if (!fs.existsSync(partnerPhotoDir)) {
+  fs.mkdirSync(partnerPhotoDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => {
+    cb(null, partnerPhotoDir);
+  },
+  filename: (_req, file, cb) => {
+    const safeName =
+      Date.now() +
+      "-" +
+      file.originalname.replace(/[^a-zA-Z0-9._-]/g, "_");
+    cb(null, safeName);
+  },
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+});
+
+/* =========================
+   GET /partneriai
+========================= */
+
 r.get("/", async (req, res) => {
   try {
     const queryLang = (req.query.lang as string | undefined)?.toUpperCase();
@@ -23,30 +54,34 @@ r.get("/", async (req, res) => {
     });
 
     const results = partners.map((p) => {
-      const fullPath = path.join(
-        partnerPhotoDir,
-        path.basename(p.imageSrc ?? "")
-      );
-
       let base64: string | null = null;
 
-      if (fs.existsSync(fullPath)) {
-        const fileBuffer = fs.readFileSync(fullPath);
-        const mime = fullPath.endsWith(".png")
-          ? "image/png"
-          : fullPath.endsWith(".jpg") || fullPath.endsWith(".jpeg")
-          ? "image/jpeg"
-          : "application/octet-stream";
-        base64 = `data:${mime};base64,${fileBuffer.toString("base64")}`;
+      if (p.imageSrc && p.imageSrc.trim() !== "") {
+        const filename = path.basename(p.imageSrc);
+        const fullPath = path.join(partnerPhotoDir, filename);
+
+        if (fs.existsSync(fullPath) && fs.statSync(fullPath).isFile()) {
+          const buffer = fs.readFileSync(fullPath);
+
+          const mime = fullPath.endsWith(".png")
+            ? "image/png"
+            : fullPath.endsWith(".jpg") || fullPath.endsWith(".jpeg")
+            ? "image/jpeg"
+            : fullPath.endsWith(".svg")
+            ? "image/svg+xml"
+            : "application/octet-stream";
+
+          base64 = `data:${mime};base64,${buffer.toString("base64")}`;
+        }
       }
 
       return {
         id: p.id,
         name: p.name,
-        image: base64,                 // logo base64 – kaip iki šiol
-        imageSrc: p.imageSrc ?? null,  // papildomai – failo kelias adminui
+        image: base64,
+        imageSrc: p.imageSrc ?? null,
         alt: p.imageAlt ?? null,
-        lang: p.lang,                  // ir kalba
+        lang: p.lang,
       };
     });
 
@@ -57,20 +92,13 @@ r.get("/", async (req, res) => {
   }
 });
 
-// POST /partneriai – sukurti naują partnerį
-r.post("/", async (req, res) => {
+/* =========================
+   POST /partneriai
+========================= */
+
+r.post("/", upload.single("file"), async (req, res) => {
   try {
-    const {
-      name,
-      imageSrc,
-      imageAlt,
-      lang,
-    }: {
-      name: string;
-      imageSrc?: string;
-      imageAlt?: string;
-      lang?: string;
-    } = req.body;
+    const { name, imageAlt, lang } = req.body;
 
     if (!name) {
       return res.status(400).json({ error: "Trūksta laukelio 'name'" });
@@ -79,10 +107,12 @@ r.post("/", async (req, res) => {
     const normalizedLang: Lang =
       lang?.toUpperCase() === "EN" ? Lang.EN : Lang.LT;
 
+    const imageSrc = req.file ? req.file.filename : "";
+
     const created = await prisma.partneris.create({
       data: {
         name,
-        imageSrc: imageSrc ?? "",
+        imageSrc,
         imageAlt: imageAlt ?? "",
         lang: normalizedLang,
       },
@@ -95,22 +125,13 @@ r.post("/", async (req, res) => {
   }
 });
 
-// PUT /partneriai/:id – atnaujinti partnerį
-r.put("/:id", async (req, res) => {
-  try {
-    const id = req.params.id; // STRING, kaip Prisma schema
+/* =========================
+   PUT /partneriai/:id
+========================= */
 
-    const {
-      name,
-      imageSrc,
-      imageAlt,
-      lang,
-    }: {
-      name?: string;
-      imageSrc?: string;
-      imageAlt?: string;
-      lang?: string;
-    } = req.body;
+r.put("/:id", upload.single("file"), async (req, res) => {
+  try {
+    const { name, imageAlt, lang } = req.body;
 
     const normalizedLang: Lang | undefined =
       lang != null
@@ -119,14 +140,19 @@ r.put("/:id", async (req, res) => {
           : Lang.LT
         : undefined;
 
+    const data: any = {
+      name,
+      imageAlt,
+      lang: normalizedLang,
+    };
+
+    if (req.file) {
+      data.imageSrc = req.file.filename;
+    }
+
     const updated = await prisma.partneris.update({
-      where: { id },
-      data: {
-        name,
-        imageSrc,
-        imageAlt,
-        lang: normalizedLang,
-      },
+      where: { id: req.params.id },
+      data,
     });
 
     res.json(updated);
@@ -136,10 +162,13 @@ r.put("/:id", async (req, res) => {
   }
 });
 
-// DELETE /partneriai/:id – ištrinti partnerį
+/* =========================
+   DELETE /partneriai/:id
+========================= */
+
 r.delete("/:id", async (req, res) => {
   try {
-    const id = req.params.id; // STRING
+    const id = req.params.id;
 
     await prisma.partneris.delete({
       where: { id },

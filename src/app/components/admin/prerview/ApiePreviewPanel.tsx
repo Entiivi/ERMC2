@@ -32,7 +32,7 @@ export function ApiePreviewPanel({
       <div className="h-[520px] rounded-xl overflow-hidden bg-white">
         <iframe
           src={src}
-          className="w-full h-full"
+          className="block w-full h-full border-0 outline-none bg-transparent"
           sandbox="allow-scripts allow-same-origin"
         />
       </div>

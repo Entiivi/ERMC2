@@ -230,7 +230,7 @@ export function CareersPanel({ apiBase }: CareersPanelProps) {
       )}
 
       {/* LENTELĖ */}
-      <div className="border border-white/70 rounded-2xl overflow-hidden bg-[#22c55e]/40">
+      <div className="rounded-2xl overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-black/20">
             <tr className="text-left">
@@ -329,7 +329,7 @@ export function CareersPanel({ apiBase }: CareersPanelProps) {
       </div>
 
       {/* FORMA */}
-      <section className="border border-white/60 rounded-2xl p-4 bg-[#22c55e]/60">
+      <section className="rounded-2xl p-4">
         <h3 className="text-lg font-semibold mb-2">
           {editingId == null ? "Pridėti naują darbo skelbimą" : "Redaguoti darbo skelbimą"}
         </h3>

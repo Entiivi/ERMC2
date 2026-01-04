@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, FormEvent } from "react";
+import { useEffect, useState, FormEvent, useRef } from "react";
 import { ServicesPreviewPanel } from "../admin/prerview/ServicesPreviewPanel"
 
 type Lang = "LT" | "EN";
@@ -154,6 +154,19 @@ export function ServicesPanel({ apiBase }: ServicesPanelProps) {
     }
   };
 
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const previewRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!previewOpen) return;
+
+    const t = window.setTimeout(() => {
+      previewRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    }, 320);
+
+    return () => window.clearTimeout(t);
+  }, [previewOpen]);
+
   return (
     <div className="space-y-6">
       {/* HEADER */}
@@ -172,7 +185,7 @@ export function ServicesPanel({ apiBase }: ServicesPanelProps) {
               setLang(newLang);
               resetForm();
             }}
-            className="text-black text-sm rounded-md px-2 py-1 border border-black"
+            className="text-black text-sm rounded-md px-2 py-1"
           >
             <option value="LT">LT</option>
             <option value="EN">EN</option>
@@ -188,7 +201,7 @@ export function ServicesPanel({ apiBase }: ServicesPanelProps) {
       )}
 
       {/* LENTELĖ */}
-      <div className="border border-white/70 rounded-2xl overflow-hidden bg-[#22c55e]/40">
+      <div className="rounded-2xl overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-black/20">
             <tr className="text-left">
@@ -274,7 +287,7 @@ export function ServicesPanel({ apiBase }: ServicesPanelProps) {
       </div>
 
       {/* FORMA: Add / Edit */}
-      <section className="border border-white/60 rounded-2xl p-4 bg-[#22c55e]/60">
+      <section className="rounded-2xl p-4">
         <h3 className="text-lg font-semibold mb-2">
           {editingId == null ? "Pridėti naują paslaugą" : "Redaguoti paslaugą"}
         </h3>
@@ -336,13 +349,13 @@ export function ServicesPanel({ apiBase }: ServicesPanelProps) {
             </label>
           </div>
 
-          <div className="flex flex-wrap gap-2 pt-2">
-            <button
+          <div className="flex flex-wrap gap-[1.5vw] pt-2">
+            <a
               type="submit"
-              className="px-4 py-1.5 rounded-full bg-black/80 hover:bg-black text-sm"
+              className="phover:scale-105 hover:text-[#14b8a6] transition-transform duration-200 pt-2 flex items-center gap-2 cursor-pointer select-none"
             >
               {editingId == null ? "Sukurti paslaugą" : "Išsaugoti pakeitimus"}
-            </button>
+            </a>
 
             {editingId != null && (
               <button
@@ -353,10 +366,39 @@ export function ServicesPanel({ apiBase }: ServicesPanelProps) {
                 Atšaukti redagavimą
               </button>
             )}
+
+            <a
+              type="button"
+              onClick={() => setPreviewOpen((v) => !v)}
+              className="p-2 rounded-full hover:bg-black/10 transition"
+              aria-label="Toggle projektų peržiūra"
+            >
+              <div className="hover:scale-105 hover:text-[#14b8a6] transition-transform duration-200 pt-2 flex items-center gap-2 cursor-pointer select-none">
+                <span>
+                  Peržiūra
+                </span>
+                <span
+                  className={`block scale-150 transition-transform duration-200 ${previewOpen ? "rotate-180" : ""
+                    }`}
+                >
+                  ▾
+                </span>
+              </div>
+
+            </a>
           </div>
         </form>
       </section>
-      <ServicesPreviewPanel lang={lang} />
+      <div
+        className={[
+          "grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out",
+          previewOpen ? "grid-rows-[1fr] opacity-100 mt-4" : "grid-rows-[0fr] opacity-0 mt-0",
+        ].join(" ")}
+      >
+        <div className="min-h-0 overflow-hidden">
+          <ServicesPreviewPanel key={lang} lang={lang} />
+        </div>
+      </div>
     </div>
   );
 }

@@ -69,7 +69,7 @@ export default function AdminPage() {
 
   return (
     <main className="min-h-screen px-[2vw] py-8 overflow-y-hidden">
-      <h1 className="text-3xl font-bold mb-[3vh] tracking-tight">ADMIN PANELĖ</h1>
+      <h1 className="text-3xl font-bold mb-[3vh] tracking-tight">ADMIN</h1>
 
       <div className="max-w-6xl mx-auto flex">
         {/* LEFT SIDEBAR */}

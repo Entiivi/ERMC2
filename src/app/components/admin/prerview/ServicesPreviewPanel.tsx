@@ -1,38 +1,39 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
-export function ServicesPreviewPanel({
-  lang,
-}: {
-  lang: "LT" | "EN";
-}) {
+type Lang = "LT" | "EN";
+
+export function ServicesPreviewPanel({ lang }: { lang: Lang }) {
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+
   const frontendBase =
     process.env.NEXT_PUBLIC_FRONTEND_URL ?? "https://localhost:3000";
 
   const src = useMemo(() => {
-    return `${frontendBase}/preview/services?lang=${lang}`;
-  }, [frontendBase, lang]);
+    // be ?lang=... nes lang siųsim per postMessage
+    return `${frontendBase}/preview/services`;
+  }, [frontendBase]);
+
+  const sendLang = () => {
+    iframeRef.current?.contentWindow?.postMessage(
+      { type: "PREVIEW_LANG", lang },
+      frontendBase
+    );
+  };
+
+  useEffect(() => {
+    sendLang();
+  }, [lang]); // kai admin'e pasikeičia lang -> nusiunčiam į preview
 
   return (
     <div className="rounded-2xl bg-white/70 p-4">
-      <div className="flex items-center justify-between mb-2">
-        <div className="text-sm font-semibold text-black">
-          Paslaugų sekcijos peržiūra
-        </div>
-        <a
-          href={src}
-          target="_blank"
-          className="text-xs text-blue-600 hover:underline"
-        >
-          Atidaryti atskirai
-        </a>
-      </div>
-
       <div className="h-[520px] rounded-xl overflow-hidden bg-white">
         <iframe
+          ref={iframeRef}
           src={src}
-          className="w-full h-full"
+          onLoad={sendLang} // kad gautų pradinį lang po užkrovimo
+          className="block w-full h-full border-0 outline-none bg-transparent"
           sandbox="allow-scripts allow-same-origin"
         />
       </div>

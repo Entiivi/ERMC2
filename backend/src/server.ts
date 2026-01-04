@@ -30,6 +30,7 @@ import electricityAdminRouter from "./routes/projectRoutes/electricityProvider";
 import electricityPublicRouter from "./routes/electricityPublic";
 import projectElectricityRouter from "./routes/projectRoutes/projectProviders";
 import materialsRouter from "./routes/materials";
+import iconsRouter from "./routes/icons";
 
 
 import cron from "node-cron";
@@ -37,6 +38,7 @@ import cron from "node-cron";
 // Routers (the one that has the streaming image endpoints)
 import projektaiRouter from "./routes/projektai";
 import servisaiTikraiservisai from "./routes/servisaiTikraiservisai";
+
 
 const allowed = [
     "http://localhost:3000",
@@ -46,6 +48,11 @@ const allowed = [
 ];
 
 const app = express();
+
+const uploadsRoot = path.join(process.cwd(), "uploads");
+console.log("Serving uploads from:", uploadsRoot);
+
+app.use("/uploadsCV", express.static(uploadsRoot));
 
 // CORS
 app.use(express.json());
@@ -213,7 +220,6 @@ app.use(
 
 
 app.use("/services", servisaiTikraiservisai);
-
 //  admin endpoints
 app.use("/admin", adminRouter);
 app.use("/external", ltIndexAdmin);
@@ -225,6 +231,7 @@ app.use("/external", ltPriceSeries);
 app.use("/external/geo", externalGeo);
 app.use("/external/electricity", externalElectricity);
 
+
 app.use("/projects", projectMaterialsRouter);
 
 app.use("/projects", projectLocationRouter);
@@ -232,7 +239,7 @@ app.use("/projects", projectLocationRouter);
 app.use("/geo", geoRouter);
 
 app.use("/rc", rcParcels);
-
+app.use("/icons", iconsRouter);
 app.use("/projects", projectRcRouter);
 
 app.use("/admin/electricity-providers", electricityAdminRouter);

@@ -17,7 +17,8 @@
     "servicesseed": "ts-node dataseeds/seed5.ts",
     "tagsseed": "ts-node dataseeds/seed6.ts",
     "elektrseed":"ts-node dataseeds/seedElektr.ts",
-    "seedWorkers":"ts-node dataseeds/seedWorkers.ts"
+    "seedWorkers":"ts-node dataseeds/seedWorkers.ts",
+    "seedMaterial":"ts-node dataseeds/seed-material.ts"
     
   },
   "keywords": [],

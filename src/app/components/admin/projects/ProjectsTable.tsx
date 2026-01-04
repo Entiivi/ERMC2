@@ -16,6 +16,12 @@ function formatDate(iso: string | undefined) {
   return d.toLocaleDateString("lt-LT");
 }
 
+const actionBtn =
+    "px-6 py-3 cursor-pointer select-none transition-transform duration-200 hover:scale-105 hover:text-[#14b8a6]";
+
+const dangerBtnSm =
+    "text-xs px-3 py-1 cursor-pointer select-none transition-transform duration-200 hover:scale-105 hover:text-[#ef4444]";
+
 export function ProjectsTable({
   loading,
   projects,
@@ -106,21 +112,21 @@ export function ProjectsTable({
                   )}
                 </td>
                 <td className="px-3 py-2 border-white/20 align-top">
-                  <div className="flex flex-wrap gap-2">
-                    <button
+                  <div className="flex flex-wrap gap-[1vw]">
+                    <a
                       type="button"
                       onClick={() => onEdit(p)}
-                      className="text-xs px-3 py-1 rounded-full bg-black/70 hover:bg-black"
+                      className={actionBtn}
                     >
                       Redaguoti
-                    </button>
-                    <button
+                    </a>
+                    <a
                       type="button"
                       onClick={() => onDelete(p.id)}
-                      className="text-xs px-3 py-1 rounded-full bg-red-700 hover:bg-red-800"
+                      className={dangerBtnSm}
                     >
                       Trinti
-                    </button>
+                    </a>
                   </div>
                 </td>
               </tr>

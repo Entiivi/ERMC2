@@ -259,7 +259,7 @@ export function ProjectsPanel({ apiBase }: ProjectsPanelProps) {
   }, [previewOpen]);
 
   return (
-    <div className="overflow-x-hidden">
+    <div className="pl-[1vw] overflow-x-hidden">
       <ProjectsHeader
         lang={lang}
         onLangChange={setLang}
