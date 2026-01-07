@@ -308,6 +308,7 @@ export function WorkersPanel({ apiBase }: WorkersPanelProps) {
             <a
               type="submit"
               className={actionBtn}
+              onClick={handleSubmit}
             >
               {editingId == null ? "Sukurti darbuotoją" : "Išsaugoti pakeitimus"}
             </a>

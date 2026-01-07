@@ -239,8 +239,10 @@ app.use("/projects", projectLocationRouter);
 app.use("/geo", geoRouter);
 
 app.use("/rc", rcParcels);
-app.use("/icons", iconsRouter);
+
 app.use("/projects", projectRcRouter);
+
+app.use("/icons", iconsRouter);
 
 app.use("/admin/electricity-providers", electricityAdminRouter);
 app.use("/electricity", electricityPublicRouter);

@@ -167,8 +167,14 @@ export function ServicesPanel({ apiBase }: ServicesPanelProps) {
     return () => window.clearTimeout(t);
   }, [previewOpen]);
 
+  const actionBtn =
+    "[all:unset] inline-flex bg-transparent border-none outline-none appearance-none px-6 py-3 !cursor-pointer select-none transition-transform duration-200 hover:scale-105 hover:text-[#14b8a6]";
+
+  const dangerBtnSm =
+    "text-xs px-3 py-1 cursor-pointer select-none transition-transform duration-200 hover:scale-105 hover:text-[#ef4444]";
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-x-hidden">
       {/* HEADER */}
       <header className="flex items-center justify-between gap-4">
         <div>
@@ -263,20 +269,20 @@ export function ServicesPanel({ apiBase }: ServicesPanelProps) {
                   </td>
                   <td className="px-3 py-2 border-b border-white/20 align-top">
                     <div className="flex flex-wrap gap-2">
-                      <button
+                      <a
                         type="button"
                         onClick={() => handleEditClick(s)}
-                        className="text-xs px-3 py-1 rounded-full bg-black/70 hover:bg-black"
+                        className={actionBtn}
                       >
                         Redaguoti
-                      </button>
-                      <button
+                      </a>
+                      <a
                         type="button"
                         onClick={() => handleDelete(s.id)}
-                        className="text-xs px-3 py-1 rounded-full bg-red-700 hover:bg-red-800"
+                        className={dangerBtnSm}
                       >
                         Trinti
-                      </button>
+                      </a>
                     </div>
                   </td>
                 </tr>
@@ -352,19 +358,19 @@ export function ServicesPanel({ apiBase }: ServicesPanelProps) {
           <div className="flex flex-wrap gap-[1.5vw] pt-2">
             <a
               type="submit"
-              className="phover:scale-105 hover:text-[#14b8a6] transition-transform duration-200 pt-2 flex items-center gap-2 cursor-pointer select-none"
+              className="hover:scale-105 hover:text-[#14b8a6] transition-transform duration-200 pt-2 flex items-center gap-2 cursor-pointer select-none"
             >
               {editingId == null ? "Sukurti paslaugą" : "Išsaugoti pakeitimus"}
             </a>
 
             {editingId != null && (
-              <button
+              <a
                 type="button"
                 onClick={resetForm}
-                className="px-4 py-1.5 rounded-full bg-white/80 hover:bg-white text-sm text-black"
+                className={dangerBtnSm}
               >
                 Atšaukti redagavimą
-              </button>
+              </a>
             )}
 
             <a

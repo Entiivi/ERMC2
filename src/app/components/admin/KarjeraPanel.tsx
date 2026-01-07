@@ -195,8 +195,14 @@ export function CareersPanel({ apiBase }: CareersPanelProps) {
     });
   };
 
+  const actionBtn =
+    "[all:unset] inline-flex bg-transparent border-none outline-none appearance-none px-6 py-3 !cursor-pointer select-none transition-transform duration-200 hover:scale-105 hover:text-[#14b8a6]";
+
+  const dangerBtnSm =
+    "text-xs px-3 py-1 cursor-pointer select-none transition-transform duration-200 hover:scale-105 hover:text-[#ef4444]";
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pr-[1vw]">
       {/* HEADER */}
       <header className="flex items-center justify-between gap-4">
         <div>
@@ -305,20 +311,20 @@ export function CareersPanel({ apiBase }: CareersPanelProps) {
                   </td>
                   <td className="px-3 py-2 border-b border-white/20 align-top">
                     <div className="flex flex-wrap gap-2">
-                      <button
+                      <a
                         type="button"
                         onClick={() => handleEditClick(job)}
-                        className="text-xs px-3 py-1 rounded-full bg-black/70 hover:bg-black"
+                        className={actionBtn}
                       >
                         Redaguoti
-                      </button>
-                      <button
+                      </a>
+                      <a
                         type="button"
                         onClick={() => handleDelete(job.id)}
-                        className="text-xs px-3 py-1 rounded-full bg-red-700 hover:bg-red-800"
+                        className={dangerBtnSm}
                       >
                         Trinti
-                      </button>
+                      </a>
                     </div>
                   </td>
                 </tr>
@@ -405,13 +411,13 @@ export function CareersPanel({ apiBase }: CareersPanelProps) {
                 <span className="text-sm">
                   Atsakomybės (kiekvienas punktas atskirame laukelyje)
                 </span>
-                <button
+                <a
                   type="button"
                   onClick={addResponsibility}
-                  className="text-xs px-3 py-1 rounded-full bg-black/80 hover:bg-black"
+                  className={actionBtn}
                 >
                   + Pridėti punktą
-                </button>
+                </a>
               </div>
 
               <div className="space-y-2">
@@ -434,7 +440,7 @@ export function CareersPanel({ apiBase }: CareersPanelProps) {
                     <button
                       type="button"
                       onClick={() => removeResponsibility(index)}
-                      className="text-xs px-2 py-1 rounded-full bg-red-700 hover:bg-red-800"
+                      className={dangerBtnSm}
                     >
                       X
                     </button>
@@ -445,14 +451,14 @@ export function CareersPanel({ apiBase }: CareersPanelProps) {
           </div>
 
           <div className="flex flex-wrap gap-2 pt-2">
-            <button
+            <a
               type="submit"
-              className="px-4 py-1.5 rounded-full bg-black/80 hover:bg-black text-sm"
+              className={actionBtn}
             >
               {editingId == null
                 ? "Sukurti darbo skelbimą"
                 : "Išsaugoti pakeitimus"}
-            </button>
+            </a>
 
             {editingId != null && (
               <button

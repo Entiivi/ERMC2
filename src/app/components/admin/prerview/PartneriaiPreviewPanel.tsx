@@ -15,10 +15,10 @@ export function PartneriaiPreviewPanel({
   }, [frontendBase, lang]);
 
   return (
-    <div className="rounded-2xl bg-white/70 p-4">
+    <div className="rounded-2xl bg-white/70">
       <div className="flex items-center justify-between mb-2">
         <div className="text-sm font-semibold text-black">
-          Paslaugų sekcijos peržiūra
+          Partnerių sekcijos peržiūra
         </div>
         <a
           href={src}

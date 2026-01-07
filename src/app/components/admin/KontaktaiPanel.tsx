@@ -187,6 +187,12 @@ export function ContactsPanel({ apiBase }: ContactsPanelProps) {
     }
   };
 
+  const actionBtn =
+    "px-6 py-3 cursor-pointer select-none transition-transform duration-200 hover:scale-105 hover:text-[#14b8a6]";
+
+  const dangerBtnSm =
+    "text-xs px-3 py-1 cursor-pointer select-none transition-transform duration-200 hover:scale-105 hover:text-[#ef4444]";
+
   return (
     <div className="space-y-6">
       {/* HEADER */}

@@ -139,8 +139,14 @@ export function PartnersPanel({ apiBase }: PartnersPanelProps) {
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
+  const actionBtn =
+    "[all:unset] inline-flex bg-transparent border-none outline-none appearance-none px-6 py-3 !cursor-pointer select-none transition-transform duration-200 hover:scale-105 hover:text-[#14b8a6]";
+
+  const dangerBtnSm =
+    "text-xs px-3 py-1 cursor-pointer select-none transition-transform duration-200 hover:scale-105 hover:text-[#ef4444]";
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-x-hidden pl-[1vw]">
       {/* HEADER */}
       <header className="flex items-center justify-between gap-4">
         <div>
@@ -240,20 +246,20 @@ export function PartnersPanel({ apiBase }: PartnersPanelProps) {
                   </td>
                   <td className="px-3 py-2 align-top">
                     <div className="flex flex-wrap gap-2">
-                      <button
+                      <a
                         type="button"
                         onClick={() => handleEditClick(p)}
-                        className="text-xs px-3 py-1 rounded-full bg-black/70 hover:bg-black"
+                        className={actionBtn}
                       >
                         Redaguoti
-                      </button>
-                      <button
+                      </a>
+                      <a
                         type="button"
                         onClick={() => handleDelete(p.id)}
-                        className="text-xs px-3 py-1 rounded-full bg-red-700 hover:bg-red-800"
+                        className={dangerBtnSm}
                       >
                         Trinti
-                      </button>
+                      </a>
                     </div>
                   </td>
                 </tr>
@@ -319,21 +325,21 @@ export function PartnersPanel({ apiBase }: PartnersPanelProps) {
           </div>
 
           <div className="flex flex-wrap gap-2 pt-2">
-            <button
+            <a
               type="submit"
-              className="px-4 py-1.5 rounded-full bg-black/80 hover:bg-black text-sm"
+              className={actionBtn}
             >
               {editingId == null ? "Sukurti partnerį" : "Išsaugoti pakeitimus"}
-            </button>
+            </a>
 
             {editingId != null && (
-              <button
+              <a
                 type="button"
                 onClick={resetForm}
-                className="px-4 py-1.5 rounded-full bg-white/80 hover:bg-white text-sm text-black"
+                className={dangerBtnSm}
               >
                 Atšaukti redagavimą
-              </button>
+              </a>
             )}
           </div>
         </form>

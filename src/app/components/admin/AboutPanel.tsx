@@ -171,7 +171,7 @@ export function AboutPanel({ apiBase }: AboutPanelProps) {
     "text-xs px-3 py-1 cursor-pointer select-none transition-transform duration-200 hover:scale-105 hover:text-[#ef4444]";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-x-hidden">
       {/* Header */}
       <header className="flex items-center justify-between gap-4">
         <div>
